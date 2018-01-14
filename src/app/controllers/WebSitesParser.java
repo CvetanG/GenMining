@@ -39,19 +39,19 @@ public class WebSitesParser {
 		
 		Element elementXMR_USD = (Element) doc.getElementsByClass("table table-striped table-bordered").get(0).childNode(1).childNode(0).childNode(3).childNode(1);
 		XMR_USD = Utils.clearFormatCurr(elementXMR_USD.text());
-		System.out.println("Monero USD: " + XMR_USD);
+		System.out.println("Monero USD: " + XMR_USD + " $");
 		
 		Element elementBlocks = (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(5);
-		System.out.println(elementBlocks.text());
 		blocks = Utils.removeSeparetors(elementBlocks.text());
+		System.out.println("Block Count: " + elementBlocks.text());
 		
 		Element elementNetwHashRate = (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(7);
 		netwHashRate = Utils.clearFormatCurr(elementNetwHashRate.text());
-		System.out.println(netwHashRate);
+		System.out.println("Network Hashrate: " + netwHashRate + " MH/s");
 		
 		Element elementDifficulty = (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(9);
-		System.out.println(elementDifficulty.text());
 		difficulty = Utils.removeSeparetors(elementDifficulty.text());
+		System.out.println("Monero Difficulty: " + elementDifficulty.text());
 		
 		GMRowEntry rowEntry = new GMRowEntry(
 				XMR_USD,

@@ -26,7 +26,7 @@ public class RunMe {
 		System.out.println("Start Program Genesis-Mining");
 		long startTime = System.currentTimeMillis();
 		
-		String localPath = "GenesisMinig.xlsx";
+		String localPath = "GenesisMining.xlsx";
 		
 		String dropboxPath = "/Finance/Genesis_Mining/" + localPath;
 		
