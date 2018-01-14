@@ -1,4 +1,10 @@
 /target/
+/bin/
+.settings/
+.loadpath
+.recommenders
+.project
+.classpath
 
 /authFile.app
 /test.app
