@@ -1,6 +1,6 @@
 #!/bin/bash
 
-root=/home/cvetan/git/My_Mnvr/GenMining
+root=/home/cvetan/git/GenMining
 
 cd ${root}
 
