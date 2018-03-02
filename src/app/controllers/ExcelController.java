@@ -148,7 +148,9 @@ public class ExcelController {
 
 		// Column M difficulty(12)
 		cellList.get(netwHashRateCol.getColNum()).setCellStyle(myCellStyles.get("csUSD"));
-		cellList.get(netwHashRateCol.getColNum()).setCellValue(Double.parseDouble(rowEntry.getNetwHashRate()));
+		Double temp = Double.parseDouble(rowEntry.getNetwHashRate());
+		Double nhr = (temp > 10.0) ? temp : (temp * 1000);
+		cellList.get(netwHashRateCol.getColNum()).setCellValue(nhr);
 		
 		// Column N difficulty(13)
 		cellList.get(difficultyCol.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
