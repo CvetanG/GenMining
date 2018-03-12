@@ -47,7 +47,7 @@ public class RunMe {
 		
 		WebSitesParser myParser = new WebSitesParser();
 		
-		GMRowEntry rowEtry_01 = myParser.getMoneroInfo();
+		myParser.getMoneroInfo();
 		
 		System.out.println("Done Parsing Websites!!!");
 		
@@ -55,7 +55,7 @@ public class RunMe {
 		
 		ExcelController myPOI = new ExcelController();
 		
-		myPOI.writeInExcel(wb, rowEtry_01);
+		myPOI.writeInExcel(wb, myParser.getRowEntry());
 		
 		System.out.println("Done Inserting Rows in Excel File!!!");
 		

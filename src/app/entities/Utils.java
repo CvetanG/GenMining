@@ -46,9 +46,9 @@ public class Utils {
 	    return formCur;
 	}
 
-	public static double removeSeparetors(String curr) {
-		curr = curr.replace(",", "");
-		double dCurrr = Double.parseDouble(curr);
+	public static long removeSeparetors(String curr) {
+//		curr = curr.replace(",", "");
+		long dCurrr = Long.parseLong(curr.replace(",", ""));
 	    return dCurrr;
 	}
 }

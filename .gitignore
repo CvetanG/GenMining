@@ -5,6 +5,7 @@
 .recommenders
 .project
 .classpath
+.metadata
 
 /authFile.app
 /test.app

@@ -72,15 +72,21 @@ public class ExcelController {
 		MyColumn diffPrivCol	= new MyColumn("I", 8);
 		MyColumn USD_DayCol		= new MyColumn("J", 9);
 		MyColumn emptyCol	 	= new MyColumn("K", 10);
-		MyColumn blocksCol 		= new MyColumn("L", 11);
-		MyColumn netwHashRateCol= new MyColumn("M", 12);
-		MyColumn difficultyCol	= new MyColumn("N", 13);
+
+		MyColumn marketCap	 	= new MyColumn("L", 11);
+		MyColumn volume	 		= new MyColumn("M", 12);
+		MyColumn circSupply	 	= new MyColumn("N", 13);
+
+		MyColumn blocksCol 		= new MyColumn("O", 14);
+		MyColumn netwHashRateCol= new MyColumn("P", 15);
+		MyColumn difficultyCol	= new MyColumn("Q", 16);
 
 		// declare a Cell object
 		String[] colNames = {
 				"numR ", "dateCol", "timeCol", "dowCol", "XMR_DayCol",
 				"hash_SecCol", "XMR_1HSCol", "XMR_USDCol",
 				"diffPrivCol", "USD_DayCol", "emptyCol",
+				"marketCap", "volume", "circSupply",
 				"blocksCol", "netwHashRateCol", "difficultyCol"
 				};
 		List<Cell> cellList = new ArrayList<Cell>(colNames.length);
@@ -115,44 +121,56 @@ public class ExcelController {
 		// Column E XMR_Day(4)
 		// fill manually 2 days behind
 
-		// Column F hash_Sec(5)
+		// Column F H/s(5)
 		cellList.get(hash_SecCol.getColNum()).setCellStyle(myCellStyles.get("csDef"));
 		cellList.get(hash_SecCol.getColNum()).setCellValue(1300);
 
-		// Column G XMR_USD(6)
+		// Column G hash_Sec(6)
 		cellList.get(XMR_1HSCol.getColNum()).setCellStyle(myCellStyles.get("csDef"));
 		cellList.get(XMR_1HSCol.getColNum()).setCellType(Cell.CELL_TYPE_FORMULA);
 		cellList.get(XMR_1HSCol.getColNum()).setCellFormula(XMR_DayCol.getColChar() + (newRow + 1) + "/" + hash_SecCol.getColChar() + (newRow + 1));
 	
 
-		// Column H diffPriv(7)
+		// Column H XMR_USD(7)
 		cellList.get(XMR_USDCol.getColNum()).setCellStyle(myCellStyles.get("csUSD"));
 		cellList.get(XMR_USDCol.getColNum()).setCellValue(Double.parseDouble(rowEntry.getXMR_USD()));
 
-		// Column I USD_Day(8)
+		// Column I diffPriv(8)
 			cellList.get(diffPrivCol.getColNum()).setCellStyle(myCellStyles.get("csPerc"));
 			cellList.get(diffPrivCol.getColNum()).setCellType(Cell.CELL_TYPE_FORMULA);
 			cellList.get(diffPrivCol.getColNum()).setCellFormula(XMR_USDCol.getColChar() + (newRow + 1) + "/" + XMR_USDCol.getColChar() + (newRow) + "-1");
 
-		// Column J empty(9)
+		// Column J USD_Day(9)
 			cellList.get(USD_DayCol.getColNum()).setCellStyle(myCellStyles.get("csUSD"));
 			cellList.get(USD_DayCol.getColNum()).setCellType(Cell.CELL_TYPE_FORMULA);
 			cellList.get(USD_DayCol.getColNum()).setCellFormula(XMR_DayCol.getColChar() + (newRow + 1) + "*" + XMR_USDCol.getColChar() + (newRow + 1));
 
 
-		// Column K blocks(10)
-
-		// Column L netwHashRate(11)
+		// Column K empty(10)
+			
+		// Column L Market Cap(11)
+		cellList.get(marketCap.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
+		cellList.get(marketCap.getColNum()).setCellValue(rowEntry.getMarketCap());
+		
+		// Column M Volume(12)
+		cellList.get(volume.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
+		cellList.get(volume.getColNum()).setCellValue(rowEntry.getVolume());
+		
+		// Column N Circulating Supply(13)
+		cellList.get(circSupply.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
+		cellList.get(circSupply.getColNum()).setCellValue(rowEntry.getCirculatingSupply());
+		
+		// Column O block(14)
 		cellList.get(blocksCol.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
 		cellList.get(blocksCol.getColNum()).setCellValue(rowEntry.getBlocks());
 
-		// Column M difficulty(12)
+		// Column P netwHashRate(15)
 		cellList.get(netwHashRateCol.getColNum()).setCellStyle(myCellStyles.get("csUSD"));
 		Double temp = Double.parseDouble(rowEntry.getNetwHashRate());
 		Double nhr = (temp > 10.0) ? temp : (temp * 1000);
 		cellList.get(netwHashRateCol.getColNum()).setCellValue(nhr);
 		
-		// Column N difficulty(13)
+		// Column Q difficulty(16)
 		cellList.get(difficultyCol.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
 		cellList.get(difficultyCol.getColNum()).setCellValue(rowEntry.getDifficulty());
 
@@ -178,10 +196,10 @@ public class ExcelController {
 				"451.30",
 				"54155462791");*/
 		WebSitesParser parser = new WebSitesParser();
-		GMRowEntry rowEntry = parser.getMoneroInfo();
+		parser.getMoneroInfo();
 		
 		ExcelController contoller = new ExcelController();
-		contoller.writeInExcel(wb, rowEntry);
+		contoller.writeInExcel(wb, parser.getRowEntry());
 		
 		fsIP.close();
 		

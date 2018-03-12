@@ -3,17 +3,25 @@ package app.entities;
 public class GMRowEntry {
 	
 	String XMR_USD;
+	long marketCap;
+	long volume;
+	long circulatingSupply;
 	double blocks;
 	String netwHashRate;
 	double difficulty;
 	
+	public GMRowEntry() {
+	}
+	
+	/*
 	public GMRowEntry(String XMR_USD, double blocks, String netwHashRate, double difficulty) {
 		this.XMR_USD = XMR_USD;
 		this.blocks = blocks;
 		this.netwHashRate = netwHashRate;
 		this.difficulty = difficulty;
 	}
-
+	*/
+	
 	public String getXMR_USD() {
 		return XMR_USD;
 	}
@@ -22,6 +30,30 @@ public class GMRowEntry {
 		this.XMR_USD = XMR_USD;
 	}
 	
+	public long getMarketCap() {
+		return marketCap;
+	}
+
+	public void setMarketCap(long marketCap) {
+		this.marketCap = marketCap;
+	}
+
+	public long getVolume() {
+		return volume;
+	}
+
+	public void setVolume(long volume) {
+		this.volume = volume;
+	}
+
+	public long getCirculatingSupply() {
+		return circulatingSupply;
+	}
+
+	public void setCirculatingSupply(long circulatingSupply) {
+		this.circulatingSupply = circulatingSupply;
+	}
+
 	public double getBlocks() {
 		return blocks;
 	}
