@@ -1,4 +1,4 @@
-set root=C:\Users\CvetanG\git\GenMining\GenMining
+set root=C:\Users\cgg\git\GenMining
 
 chcp UTF-8
 
