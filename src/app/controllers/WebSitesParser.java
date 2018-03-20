@@ -51,7 +51,7 @@ public class WebSitesParser {
 		
 		Element elementXMR_USD = (Element) doc.getElementsByClass("table table-striped table-bordered").get(0).childNode(1).childNode(0).childNode(3).childNode(1);
 		XMR_USD = Utils.clearFormatCurr(elementXMR_USD.text());
-		System.out.println("Monero USD: $" + elementXMR_USD.text());
+		System.out.println("Monero USD: " + elementXMR_USD.text());
 		
 		Element elementBlocks = (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(5);
 		blocks = Utils.removeSeparetors(elementBlocks.text());
