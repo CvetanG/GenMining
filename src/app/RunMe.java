@@ -18,6 +18,7 @@ import app.controllers.ExcelController;
 import app.controllers.WebSitesParser;
 import app.entities.GMRowEntry;
 import app.entities.Utils;
+import app.kraken.Kraken;
 
 public class RunMe {
 
@@ -72,6 +73,9 @@ public class RunMe {
 		output_file.close();
 		
 		myDropbox.uploadFile(client, localFile, dropboxPath);
+		
+		Kraken kr = new Kraken();
+		kr.init();
         
         long endTime   = System.currentTimeMillis();
 		System.err.println(Utils.duration(startTime, endTime));
