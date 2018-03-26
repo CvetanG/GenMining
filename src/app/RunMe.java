@@ -74,8 +74,10 @@ public class RunMe {
 		
 		myDropbox.uploadFile(client, localFile, dropboxPath);
 		
-		Kraken kr = new Kraken();
-		kr.init();
+		Kraken kr20 = new Kraken(20);
+		kr20.init();
+		Kraken kr55 = new Kraken(55);
+		kr55.init();
         
         long endTime   = System.currentTimeMillis();
 		System.err.println(Utils.duration(startTime, endTime));

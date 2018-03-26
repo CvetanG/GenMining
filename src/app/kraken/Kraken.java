@@ -1,6 +1,9 @@
 package app.kraken;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -18,68 +21,101 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class Kraken {
-	public int last = 20;
+	public int last;
 	public String strUrl = "https://api.kraken.com/0/public/OHLC?pair=XXMRZUSD&interval=1440";
 	public List<OHLC> finalList;
+	public double curPrice;
 	public double lastTR;
 	public double lastMIN;
 	public double lastMAX;
-	
+
+	public Kraken(int last) {
+		this.last = last;
+	}
+
 	public void init(){
 		getLastData();
 		calculateMinMax();
 		calculateTR();
 		print();
 	}
-	
+
 	private void getLastData() {
-		BufferedReader rd;
-		OutputStreamWriter wr;
+		String element = "result";
+		String subElement = "XXMRZUSD";
+		File file = new File(subElement + "_dataList.json");
 		this.finalList = new ArrayList<OHLC>();
 
-		try {
-			URL url = new URL(strUrl);
-			URLConnection conn = url.openConnection();
-			conn.setDoOutput(true);
-			wr = new OutputStreamWriter(conn.getOutputStream());
-			wr.flush();
+		BufferedReader rd;
+		OutputStreamWriter wr;
+		JsonArray data =  null;
+		String line;
+		FileReader fr;
 
-			// Get the response
-			rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			
-			StringBuilder sb = new StringBuilder();
-			String line;
-			while ((line = rd.readLine()) != null) {
-				sb.append(line);
-//				System.out.println(line);
+		Gson gson = new Gson();
+		JsonParser parser = new JsonParser();
+		StringBuilder sb = new StringBuilder();
+
+		long OneMinuteMillis = (1 * 1000)  * 60;
+		long millis = System.currentTimeMillis();
+		boolean check = (file.lastModified() + OneMinuteMillis) > millis;
+
+		if (file.exists() && check) {
+			try {
+				fr = new FileReader(file);
+				rd = new BufferedReader(fr);
+				while ((line = rd.readLine()) != null) {
+					sb.append(line);
+				}
+				data = parser.parse(sb.toString()).getAsJsonArray();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			
-			String element = "result";
-			String subElement = "XXMRZUSD";
-			Gson gson = new Gson();
-			JsonParser parser = new JsonParser();
-			
-			JsonObject json = parser.parse(sb.toString()).getAsJsonObject();
-			JsonObject result = json.getAsJsonObject(element);
-			
-			JsonArray  data = result.getAsJsonArray(subElement);
-			
-			int temp = data.size() - (last + 1);
-			
-			for (int i = temp; i < data.size(); i++) {
-				this.finalList.add(jsonElementToOHLC(gson, data.get(i)));
+		} else {
+			try {
+				System.out.println("... Downloading New Data From Kraken");
+				URL url = new URL(strUrl);
+				URLConnection conn = url.openConnection();
+				conn.setDoOutput(true);
+				wr = new OutputStreamWriter(conn.getOutputStream());
+				wr.flush();
+
+				// Get the response
+				rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+
+				while ((line = rd.readLine()) != null) {
+					sb.append(line);
+					//						System.out.println(line);
+				}
+				JsonObject json = parser.parse(sb.toString()).getAsJsonObject();
+				JsonObject result = json.getAsJsonObject(element);
+
+				data = result.getAsJsonArray(subElement);
+
+				FileWriter  fw = new FileWriter(file, false);
+
+				fw.write(data.toString());
+				fw.close();
+			} catch (Exception e) {
+				System.out.println(e.toString());
 			}
-			
-		} catch (Exception e) {
-			System.out.println(e.toString());
 		}
+
+		int temp = data.size() - (last + 1);
+
+		for (int i = temp; i < data.size(); i++) {
+			this.finalList.add(jsonElementToOHLC(gson, data.get(i)));
+		}
+		this.curPrice =  this.finalList.get(last).getClose();
+
 	}
-	
+
 	private OHLC jsonElementToOHLC(Gson gson, JsonElement jsonElement) {
 		OHLC result = new OHLC();
 
 		List<String> yourList = gson.fromJson(jsonElement, new TypeToken<List<String>>(){}.getType());
-	    
+
 		result.setTime(yourList.get(0));
 		result.setOpen(Double.parseDouble(yourList.get(1)));
 		result.setHigh(Double.parseDouble(yourList.get(2)));
@@ -100,56 +136,57 @@ public class Kraken {
 		double TR3;
 		List<Double> listTRMax = new ArrayList<>();
 		PriorityQueue<Double> pq;
-		
+
 		for (int i = 1; i < this.finalList.size(); i++) {
 			TR1 = Math.abs(this.finalList.get(i).getHigh() - this.finalList.get(i).getLow());
 			TR2 = Math.abs(this.finalList.get(i - 1).getClose() - this.finalList.get(i).getHigh());
 			TR3 = Math.abs(this.finalList.get(i - 1).getClose() - this.finalList.get(i).getLow());
-			
+
 			pq = new PriorityQueue<>(3, Collections.reverseOrder());
 			pq.add(TR1);
 			pq.add(TR2);
 			pq.add(TR3);
 			listTRMax.add(pq.peek());
 		}
-		
+
 		Double sum = 0.0;
 		for (Double TRMax: listTRMax) {
-		    sum += TRMax;
+			sum += TRMax;
 		}
 		this.lastTR =  sum.doubleValue() / listTRMax.size();
-		
+
 	}
-	
+
 	private void calculateMinMax() {
 		PriorityQueue<Double> pqMin = new PriorityQueue<>(this.finalList.size());
 		PriorityQueue<Double> pqMax = new PriorityQueue<>(this.finalList.size(), Collections.reverseOrder());
-		
+
 		for (OHLC element : this.finalList) {
 			pqMin.add(element.getLow());
 			pqMax.add(element.getHigh());
 		}
-		
+
 		this.lastMIN = pqMin.peek();
 		this.lastMAX = pqMax.peek();;
-		
+
 	}
-	
+
 	private void print() {
 		System.out.println("***** TRADING INFO *****");
 		System.out.println("Data info for " + (this.finalList.size() - 1) + " day/s period.");
 		System.out.println(String.format("Average TR: %.2f", this.lastTR));
-		System.out.println(String.format("Min XMRUSD: %.2f$", this.lastMIN));
-		System.out.println(String.format("Max XMRUSD: %.2f$", this.lastMAX));
-//		System.out.println("Average TR for period: " + this.lastTR);
-//		System.out.println("Min XMRUSD for period: " + this.lastMIN + "$");
-//		System.out.println("Max XMRUSD for period: " + this.lastMAX + "$");
+		System.out.println(String.format("Current Price: %.2f$", this.curPrice));
+		System.out.println(String.format("Min XMRUSD: %.2f$/%.2f", this.lastMIN, this.curPrice - this.lastMIN));
+		System.out.println(String.format("Max XMRUSD: %.2f$/%.2f", this.lastMAX, this.curPrice - this.lastMAX));
+		//		System.out.println("Average TR for period: " + this.lastTR);
+		//		System.out.println("Min XMRUSD for period: " + this.lastMIN + "$");
+		//		System.out.println("Max XMRUSD for period: " + this.lastMAX + "$");
 	}
-	
-	
-	
+
 	public static void main(String args[]) {
-		Kraken k = new Kraken();
-		k.init();
+		Kraken k20 = new Kraken(20);
+		k20.init();
+		Kraken k55 = new Kraken(55);
+		k55.init();
 	}
 }
