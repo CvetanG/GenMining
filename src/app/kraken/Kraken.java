@@ -55,8 +55,9 @@ public class Kraken {
 		Gson gson = new Gson();
 		JsonParser parser = new JsonParser();
 		StringBuilder sb = new StringBuilder();
-
-		long OneMinuteMillis = (1 * 1000)  * 60;
+		int minute = 30;
+		int periodMinutes = minute * 60 * 5;
+		long OneMinuteMillis = (periodMinutes * 1000)  * 60;
 		long millis = System.currentTimeMillis();
 		boolean check = (file.lastModified() + OneMinuteMillis) > millis;
 
@@ -182,8 +183,18 @@ public class Kraken {
 		//		System.out.println("Min XMRUSD for period: " + this.lastMIN + "$");
 		//		System.out.println("Max XMRUSD for period: " + this.lastMAX + "$");
 	}
+	
+	public List<OHLC> getFinalList() {
+		return finalList;
+	}
+
+	public void setFinalList(List<OHLC> finalList) {
+		this.finalList = finalList;
+	}
 
 	public static void main(String args[]) {
+		Kraken k10 = new Kraken(10);
+		k10.init();
 		Kraken k20 = new Kraken(20);
 		k20.init();
 		Kraken k55 = new Kraken(55);

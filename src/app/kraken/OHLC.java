@@ -73,5 +73,11 @@ public class OHLC {
 	public void setCount(double count) {
 		this.count = count;
 	}
+
+	@Override
+	public String toString() {
+		return "OHLC high=" + high + ", low=" + low + "";
+	}
+	
 	
 }
