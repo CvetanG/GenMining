@@ -56,10 +56,10 @@ public class Kraken {
 		JsonParser parser = new JsonParser();
 		StringBuilder sb = new StringBuilder();
 		int minute = 30;
-		int periodMinutes = minute * 60 * 5;
-		long OneMinuteMillis = (periodMinutes * 1000)  * 60;
+		int seconds = minute * 60;
+		long periodMillis = (seconds * 1000);
 		long millis = System.currentTimeMillis();
-		boolean check = (file.lastModified() + OneMinuteMillis) > millis;
+		boolean check = (file.lastModified() + periodMillis) > millis;
 
 		if (file.exists() && check) {
 			try {
