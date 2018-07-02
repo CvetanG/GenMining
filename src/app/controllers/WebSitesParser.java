@@ -82,15 +82,16 @@ public class WebSitesParser {
 		long volume;
 		long circulatingSupply;
 		
-		Element elementMarketCap = (Element) doc.getElementsByClass("col-sm-8 col-sm-push-4").get(0).childNode(1).childNode(3).childNode(1).childNode(1);
+		String tagClassName= "details-panel-item--marketcap-stats flex-container";
+		Element elementMarketCap = (Element) doc.getElementsByClass(tagClassName).get(0).childNode(1).childNode(3).childNode(1).childNode(1);
 		marketCap = Utils.removeSeparetors(elementMarketCap.text());
 		System.out.println("Market Cap: $" + elementMarketCap.text());
 		
-		Element elementVolume = (Element) doc.getElementsByClass("col-sm-8 col-sm-push-4").get(0).childNode(3).childNode(3).childNode(1);
+		Element elementVolume = (Element) doc.getElementsByClass(tagClassName).get(0).childNode(3).childNode(3).childNode(1);
 		volume = Utils.removeSeparetors(elementVolume.text().substring(0, elementVolume.text().length()-4));
 		System.out.println("Volume (24h): $" + elementVolume.text());
 		
-		Element elementCirculatingSupply = (Element) doc.getElementsByClass("col-sm-8 col-sm-push-4").get(0).childNode(7).childNode(3).childNode(1);
+		Element elementCirculatingSupply = (Element) doc.getElementsByClass(tagClassName).get(0).childNode(5).childNode(3).childNode(1);
 		circulatingSupply = Utils.removeSeparetors(elementCirculatingSupply.text());
 		System.out.println("Circulating Supply: " + elementCirculatingSupply.text());
 		
