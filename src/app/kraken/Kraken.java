@@ -21,8 +21,10 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class Kraken {
+	public static final String STR_URL = "https://api.kraken.com/0/public/OHLC?pair=XXMRZUSD&interval=1440";
+	private static final String INDEX = "XMRUSD";
+	
 	public int last;
-	public String strUrl = "https://api.kraken.com/0/public/OHLC?pair=XXMRZUSD&interval=1440";
 	public List<OHLC> finalList;
 	public double curPrice;
 	public double lastTR;
@@ -75,7 +77,7 @@ public class Kraken {
 		} else {
 			try {
 				System.out.println("... Downloading New Data From Kraken");
-				URL url = new URL(strUrl);
+				URL url = new URL(STR_URL);
 				URLConnection conn = url.openConnection();
 				conn.setDoOutput(true);
 				wr = new OutputStreamWriter(conn.getOutputStream());
@@ -177,11 +179,8 @@ public class Kraken {
 		System.out.println("Data info for " + (this.finalList.size() - 1) + " day/s period.");
 		System.out.println(String.format("Average TR: %.2f", this.lastTR));
 		System.out.println(String.format("Current Price: %.2f$", this.curPrice));
-		System.out.println(String.format("Min XMRUSD: %.2f$/%.2f", this.lastMIN, this.curPrice - this.lastMIN));
-		System.out.println(String.format("Max XMRUSD: %.2f$/%.2f", this.lastMAX, this.curPrice - this.lastMAX));
-		//		System.out.println("Average TR for period: " + this.lastTR);
-		//		System.out.println("Min XMRUSD for period: " + this.lastMIN + "$");
-		//		System.out.println("Max XMRUSD for period: " + this.lastMAX + "$");
+		System.out.println(String.format("Min %s: %.2f$/%.2f", INDEX, this.lastMIN, this.curPrice - this.lastMIN));
+		System.out.println(String.format("Max %s: %.2f$/%.2f", INDEX, this.lastMAX, this.curPrice - this.lastMAX));
 	}
 	
 	public List<OHLC> getFinalList() {
