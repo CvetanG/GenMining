@@ -179,8 +179,13 @@ public class Kraken {
 		System.out.println("Data info for " + (this.finalList.size() - 1) + " day/s period.");
 		System.out.println(String.format("Average TR: %.2f", this.lastTR));
 		System.out.println(String.format("Current Price: %.2f$", this.curPrice));
-		System.out.println(String.format("Min %s: %.2f$/%.2f", INDEX, this.lastMIN, this.curPrice - this.lastMIN));
-		System.out.println(String.format("Max %s: %.2f$/%.2f", INDEX, this.lastMAX, this.curPrice - this.lastMAX));
+		System.out.println(String.format("Min %s: %.2f$/%.2f%s", INDEX, this.lastMIN, calcPercent(this.lastMIN, this.curPrice), "%"));
+		System.out.println(String.format("Max %s: %.2f$/%.2f%s", INDEX, this.lastMAX, calcPercent(this.lastMAX, this.curPrice), "%"));
+	}
+	
+	private double calcPercent(double a, double b) {
+		 double pers = (a * 100.0f) / b;
+		 return -(100.0 - pers);
 	}
 	
 	public List<OHLC> getFinalList() {
