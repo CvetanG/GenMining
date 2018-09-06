@@ -16,7 +16,6 @@ import com.dropbox.core.v2.DbxClientV2;
 import app.controllers.DropboxController;
 import app.controllers.ExcelController;
 import app.controllers.WebSitesParser;
-import app.entities.GMRowEntry;
 import app.entities.Utils;
 import app.kraken.Kraken;
 
@@ -73,10 +72,10 @@ public class RunMe {
 		output_file.close();
 		
 		myDropbox.uploadFile(client, localFile, dropboxPath);
-		
-		Kraken kr20 = new Kraken(20);
+		String pair = "XXMRZUSD";
+		Kraken kr20 = new Kraken(pair, 20);
 		kr20.init();
-		Kraken kr55 = new Kraken(55);
+		Kraken kr55 = new Kraken(pair, 55);
 		kr55.init();
         
         long endTime   = System.currentTimeMillis();

@@ -41,7 +41,7 @@ public class TradingContracts{
 		USD -= USD;
 		if (print) {
 //			System.out.println(data);
-			System.out.println(String.format("Buying on day - " + day + " XMR/USD " + data.getLow() + " XMR: %.2f USD: %.2f$", XMR, USD));
+			System.out.println(String.format("Buying  XMR on day %2d - XMR/USD %6.2f; XMR: %5.2f, USD: %05.2f$", day, data.getLow(), XMR, USD));
 		}
 	}
 	
@@ -50,7 +50,7 @@ public class TradingContracts{
 		XMR -= XMR;
 		if (print) {
 //			System.out.println(data);
-			System.out.println(String.format("Selling on day - " + day + " XMR/USD " + data.getHigh()+ " XMR: %.2f USD: %.2f$", XMR, USD));
+			System.out.println(String.format("Selling XMR on day %2d - XMR/USD %6.2f; XMR: %5.2f, USD: %05.2f$", day, data.getLow(), XMR, USD));
 		}
 	}
 	

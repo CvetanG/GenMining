@@ -21,8 +21,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class Kraken {
-	public static final String STR_URL = "https://api.kraken.com/0/public/OHLC?pair=XXMRZUSD&interval=1440";
-	private static final String INDEX = "XMRUSD";
 	
 	public int last;
 	public List<OHLC> finalList;
@@ -30,8 +28,12 @@ public class Kraken {
 	public double lastTR;
 	public double lastMIN;
 	public double lastMAX;
+	private String index;
+	public String strUrl;
 
-	public Kraken(int last) {
+	public Kraken(String index, int last) {
+		this.index = index.toUpperCase();
+		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + index.toUpperCase() + "&interval=1440";
 		this.last = last;
 	}
 
@@ -44,8 +46,7 @@ public class Kraken {
 
 	private void getLastData() {
 		String element = "result";
-		String subElement = "XXMRZUSD";
-		File file = new File(subElement + "_dataList.json");
+		File file = new File(index + "_dataList.json");
 		this.finalList = new ArrayList<OHLC>();
 
 		BufferedReader rd;
@@ -77,7 +78,7 @@ public class Kraken {
 		} else {
 			try {
 				System.out.println("... Downloading New Data From Kraken");
-				URL url = new URL(STR_URL);
+				URL url = new URL(strUrl);
 				URLConnection conn = url.openConnection();
 				conn.setDoOutput(true);
 				wr = new OutputStreamWriter(conn.getOutputStream());
@@ -94,7 +95,7 @@ public class Kraken {
 				JsonObject json = parser.parse(sb.toString()).getAsJsonObject();
 				JsonObject result = json.getAsJsonObject(element);
 
-				data = result.getAsJsonArray(subElement);
+				data = result.getAsJsonArray(index);
 
 				FileWriter  fw = new FileWriter(file, false);
 
@@ -179,8 +180,8 @@ public class Kraken {
 		System.out.println("Data info for " + (this.finalList.size() - 1) + " day/s period.");
 		System.out.println(String.format("Average TR: %.2f", this.lastTR));
 		System.out.println(String.format("Current Price: %.2f$", this.curPrice));
-		System.out.println(String.format("Min %s: %.2f$/%.2f%s", INDEX, this.lastMIN, calcPercent(this.lastMIN, this.curPrice), "%"));
-		System.out.println(String.format("Max %s: %.2f$/%.2f%s", INDEX, this.lastMAX, calcPercent(this.lastMAX, this.curPrice), "%"));
+		System.out.println(String.format("Min %s: %.2f$/%.2f%s", index, this.lastMIN, calcPercent(this.lastMIN, this.curPrice), "%"));
+		System.out.println(String.format("Max %s: %.2f$/%.2f%s", index, this.lastMAX, calcPercent(this.lastMAX, this.curPrice), "%"));
 	}
 	
 	private double calcPercent(double a, double b) {
@@ -197,11 +198,12 @@ public class Kraken {
 	}
 
 	public static void main(String args[]) {
-		Kraken k10 = new Kraken(10);
+		String pair = "XXMRZUSD";
+		Kraken k10 = new Kraken(pair, 10);
 		k10.init();
-		Kraken k20 = new Kraken(20);
+		Kraken k20 = new Kraken(pair, 20);
 		k20.init();
-		Kraken k55 = new Kraken(55);
+		Kraken k55 = new Kraken(pair, 55);
 		k55.init();
 	}
 }

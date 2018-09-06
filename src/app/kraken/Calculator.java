@@ -113,8 +113,8 @@ public class Calculator extends Application {
 	public static void main(String[] args) {
 
 		SimpleDateFormat dtf = new SimpleDateFormat("dd/MM");
-
-		Kraken k = new Kraken(size);
+		String pair = "XXMRZUSD";
+		Kraken k = new Kraken(pair, size);
 		k.init();
 
 		Combinations c = new Combinations(size);
