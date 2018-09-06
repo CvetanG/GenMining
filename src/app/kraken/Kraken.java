@@ -46,7 +46,10 @@ public class Kraken {
 
 	private void getLastData() {
 		String element = "result";
-		File file = new File(index + "_dataList.json");
+		StringBuilder fileUrl = new StringBuilder("market_data/");
+		fileUrl.append(index);
+		fileUrl.append("_dataList.json");
+		File file = new File(fileUrl.toString());
 		this.finalList = new ArrayList<OHLC>();
 
 		BufferedReader rd;
@@ -105,14 +108,12 @@ public class Kraken {
 				System.out.println(e.toString());
 			}
 		}
-
 		int temp = data.size() - (last + 1);
-
+		
 		for (int i = temp; i < data.size(); i++) {
 			this.finalList.add(jsonElementToOHLC(gson, data.get(i)));
 		}
 		this.curPrice =  this.finalList.get(last).getClose();
-
 	}
 
 	private OHLC jsonElementToOHLC(Gson gson, JsonElement jsonElement) {
