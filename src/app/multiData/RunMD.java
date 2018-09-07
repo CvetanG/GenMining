@@ -54,10 +54,10 @@ public class RunMD {
 						for (String remove : pairsRemove) {
 							if (pair.contains(remove)) {
 								isGood = false;
+								break;
 							}
 						}	
 							if (isGood) {
-								
 								if (!pairsOnly.isEmpty()) {
 									for (String only : pairsOnly) {
 										if (pair.contains(only)) {
@@ -70,16 +70,7 @@ public class RunMD {
 								} else {
 									processJson(pairs, entry, pair);
 								}
-								
-								
-								
-//							}
-							
-							
-							
-						} // end of for
-						
-						
+						}
 					} else {
 						if (!pairsOnly.isEmpty()) {
 							for (String only : pairsOnly) {
