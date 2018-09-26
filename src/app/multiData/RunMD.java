@@ -112,7 +112,7 @@ public class RunMD {
 //		}
 		
 		int period = 55;
-		int topNum = 3;
+		int topNum = 5;
 		MultiData md = new MultiData(pairs, period, topNum);
 		md.init(false);
 	}

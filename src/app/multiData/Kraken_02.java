@@ -24,7 +24,7 @@ import app.kraken.OHLC;
 
 public class Kraken_02 {
 	
-	private final static int minute = 60; // downloaded files good for this period
+	private final static int minute = 15; // downloaded files good for this period
 	
 	private int period; // days to get Data for
 	private List<OHLC> finalList;
@@ -84,6 +84,7 @@ public class Kraken_02 {
 
 		if (file.exists() && check) {
 			try {
+				System.out.println("... There is Data For Index: " + index);
 				fr = new FileReader(file);
 				rd = new BufferedReader(fr);
 				while ((line = rd.readLine()) != null) {
