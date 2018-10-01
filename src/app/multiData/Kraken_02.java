@@ -126,11 +126,20 @@ public class Kraken_02 {
 	}
 
 	private void processData(JsonArray data) {
-		int temp = data.size() - (this.period + 1);
-		for (int i = temp; i < data.size(); i++) {
-			this.finalList.add(MultiDataUtils.jsonElementToOHLC(data.get(i)));
+		int temp = 0;
+		if (data.size() > this.period) {
+			temp = data.size() - (this.period + 1);
+			for (int i = temp; i < data.size(); i++) {
+				this.finalList.add(MultiDataUtils.jsonElementToOHLC(data.get(i)));
+			}
+			this.curPrice = this.finalList.get(this.period).getClose();
+		} else {
+			this.period = data.size();
+			for (int i = temp; i < data.size(); i++) {
+				this.finalList.add(MultiDataUtils.jsonElementToOHLC(data.get(i)));
+			}
+			this.curPrice = this.finalList.get(this.period - 1).getClose();
 		}
-		this.curPrice = this.finalList.get(this.period).getClose();
 	}
 
 	private void calculateTR() {
