@@ -1,12 +1,15 @@
 package app.multiData;
 
 public class PairDec {
-	String pair;
-	int dec;
+	
+	private String pair;
+	private int dec;
+	private Boolean good;
 	
 	public PairDec(String pair, int dec) {
 		this.pair = pair;
 		this.dec = dec;
+		this.good = false;
 	}
 	
 	public String getPair() {
@@ -24,10 +27,18 @@ public class PairDec {
 	public void setDec(int dec) {
 		this.dec = dec;
 	}
+	
+	public Boolean getGood() {
+		return good;
+	}
+
+	public void setGood(Boolean good) {
+		this.good = good;
+	}
 
 	@Override
 	public String toString() {
-		return "PairDec [" + pair + " "+ dec + "]";
+		return "PairDec [" + pair + " "+ dec + " " + good + "]";
 	}
 	
 	

@@ -21,11 +21,11 @@ public class RunMD {
 	private static List<String> pairsOnly = new ArrayList<>();
 	private static List<String> pairsRemove = new ArrayList<>();
 	static {
-		pairsRemove.add(".d");
-		pairsRemove.add("USDT");
-
 		pairsOnly.add("XMR");
 		pairsOnly.add("USD");
+		
+		pairsRemove.add(".d");
+		pairsRemove.add("USDT");
 	}
 
 	public static List<PairDec> getAllPairs() {
@@ -48,61 +48,50 @@ public class RunMD {
 
 				for (Entry<String, JsonElement> entry : result.entrySet()) {
 					String pair = entry.getKey().toString();
-					boolean isGood = true;
-
-					if (!pairsRemove.isEmpty()) {
-						for (String remove : pairsRemove) {
-							if (pair.contains(remove)) {
-								isGood = false;
-								break;
-							}
-						}	
-							if (isGood) {
-								if (!pairsOnly.isEmpty()) {
-									for (String only : pairsOnly) {
-										if (pair.contains(only)) {
-											processJson(pairs, entry, pair);
-											break;
-										} else {
-											continue;
-										}
-									}
-								} else {
-									processJson(pairs, entry, pair);
-								}
-						}
-					} else {
-						if (!pairsOnly.isEmpty()) {
-							for (String only : pairsOnly) {
-								if (pair.contains(only)) {
-									processJson(pairs, entry, pair);
-									break;
-								} else {
-									continue;
-								}
-							}
-						} else {
-							processJson(pairs, entry, pair);
-						}
-					}
+					JsonObject object = entry.getValue().getAsJsonObject();
+					int dec = object.get("pair_decimals").getAsInt();
+					pairs.add(new PairDec(pair, dec));
 				}
 			}
+					
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 		return pairs;
 	}
-
-	private static void processJson(List<PairDec> pairs, Entry<String, JsonElement> entry, String pair) {
-		JsonObject object = entry.getValue().getAsJsonObject();
-		int dec = object.get("pair_decimals").getAsInt();
-		pairs.add(new PairDec(pair, dec));
-	}
-
-	public static List<PairDec> getAllPairs(List<PairDec> pairs) {
-		return null;
+	
+	public static List<PairDec> filterPairs(List<PairDec> initialPairs) {
+		List<PairDec> filteredPairs = new ArrayList<>();
+		for (PairDec pair : initialPairs) {
+			if (!pairsOnly.isEmpty()) {
+				for (String currency : pairsOnly) {
+					if (pair.getPair().contains(currency)) {
+						pair.setGood(true);
+						break;
+					}
+				}
+			} else {
+				pair.setGood(true);
+			}
+			if (!pairsRemove.isEmpty()) {
+				for (String currency : pairsRemove) {
+					if (pair.getPair().contains(currency)) {
+						pair.setGood(false);
+						break;
+					}
+				}
+			}
+		}
+		
+		for (PairDec pair : initialPairs) {
+			if (pair.getGood()) {
+				filteredPairs.add(pair);
+			}
+		}
+		return filteredPairs;
 	}
 	
+
 	public static void main(String[] args) {
 		List<PairDec> pairs = getAllPairs();
 		System.out.println(pairs.size());
@@ -113,7 +102,13 @@ public class RunMD {
 		
 		int period = 55;
 		int topNum = 5;
-		MultiData md = new MultiData(pairs, period, topNum);
+		List<PairDec> filteredPairs = filterPairs(pairs);
+		System.out.println(filteredPairs.size());
+		
+//		for (PairDec p : filteredPairs) {
+//			System.out.println(p);
+//		}
+		MultiData md = new MultiData(filteredPairs, period, topNum);
 		md.init(false);
 	}
 }
