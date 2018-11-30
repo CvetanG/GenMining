@@ -22,19 +22,20 @@ import com.google.gson.reflect.TypeToken;
 
 public class Kraken {
 	
-	public int last;
-	public List<OHLC> finalList;
-	public double curPrice;
-	public double lastTR;
-	public double lastMIN;
-	public double lastMAX;
-	private String index;
+	public int period;
+	public List<OHLC> periodList;
+	public double lastPrice;
+	public double lastOpen;
+	public double periodTR;
+	public double periodMIN;
+	public double periodMAX;
+	private String pair;
 	public String strUrl;
 
-	public Kraken(String index, int last) {
-		this.index = index.toUpperCase();
-		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + index.toUpperCase() + "&interval=1440";
-		this.last = last;
+	public Kraken(String pair, int period) {
+		this.pair = pair.toUpperCase();
+		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + pair.toUpperCase() + "&interval=1440";
+		this.period = period;
 	}
 
 	public void init(){
@@ -47,10 +48,10 @@ public class Kraken {
 	private void getLastData() {
 		String element = "result";
 		StringBuilder fileUrl = new StringBuilder("market_data/");
-		fileUrl.append(index);
+		fileUrl.append(pair);
 		fileUrl.append("_dataList.json");
 		File file = new File(fileUrl.toString());
-		this.finalList = new ArrayList<OHLC>();
+		this.periodList = new ArrayList<OHLC>();
 
 		BufferedReader rd;
 		OutputStreamWriter wr;
@@ -98,7 +99,7 @@ public class Kraken {
 				JsonObject json = parser.parse(sb.toString()).getAsJsonObject();
 				JsonObject result = json.getAsJsonObject(element);
 
-				data = result.getAsJsonArray(index);
+				data = result.getAsJsonArray(pair);
 
 				FileWriter  fw = new FileWriter(file, false);
 
@@ -108,12 +109,13 @@ public class Kraken {
 				System.out.println(e.toString());
 			}
 		}
-		int temp = data.size() - (last + 1);
+		int temp = data.size() - (period + 1);
 		
 		for (int i = temp; i < data.size(); i++) {
-			this.finalList.add(jsonElementToOHLC(gson, data.get(i)));
+			this.periodList.add(jsonElementToOHLC(gson, data.get(i)));
 		}
-		this.curPrice =  this.finalList.get(last).getClose();
+		this.lastPrice =  this.periodList.get(period).getClose();
+		this.lastOpen =  this.periodList.get(period).getOpen();
 	}
 
 	private OHLC jsonElementToOHLC(Gson gson, JsonElement jsonElement) {
@@ -142,10 +144,10 @@ public class Kraken {
 		List<Double> listTRMax = new ArrayList<>();
 		PriorityQueue<Double> pq;
 
-		for (int i = 1; i < this.finalList.size(); i++) {
-			TR1 = Math.abs(this.finalList.get(i).getHigh() - this.finalList.get(i).getLow());
-			TR2 = Math.abs(this.finalList.get(i - 1).getClose() - this.finalList.get(i).getHigh());
-			TR3 = Math.abs(this.finalList.get(i - 1).getClose() - this.finalList.get(i).getLow());
+		for (int i = 1; i < this.periodList.size(); i++) {
+			TR1 = Math.abs(this.periodList.get(i).getHigh() - this.periodList.get(i).getLow());
+			TR2 = Math.abs(this.periodList.get(i - 1).getClose() - this.periodList.get(i).getHigh());
+			TR3 = Math.abs(this.periodList.get(i - 1).getClose() - this.periodList.get(i).getLow());
 
 			pq = new PriorityQueue<>(3, Collections.reverseOrder());
 			pq.add(TR1);
@@ -158,44 +160,48 @@ public class Kraken {
 		for (Double TRMax: listTRMax) {
 			sum += TRMax;
 		}
-		this.lastTR =  sum.doubleValue() / listTRMax.size();
+		this.periodTR =  sum.doubleValue() / listTRMax.size();
 
 	}
 
 	private void calculateMinMax() {
-		PriorityQueue<Double> pqMin = new PriorityQueue<>(this.finalList.size());
-		PriorityQueue<Double> pqMax = new PriorityQueue<>(this.finalList.size(), Collections.reverseOrder());
+		PriorityQueue<Double> pqMin = new PriorityQueue<>(this.periodList.size());
+		PriorityQueue<Double> pqMax = new PriorityQueue<>(this.periodList.size(), Collections.reverseOrder());
 
-		for (OHLC element : this.finalList) {
+		for (OHLC element : this.periodList) {
 			pqMin.add(element.getLow());
 			pqMax.add(element.getHigh());
 		}
 
-		this.lastMIN = pqMin.peek();
-		this.lastMAX = pqMax.peek();;
+		this.periodMIN = pqMin.peek();
+		this.periodMAX = pqMax.peek();;
 
 	}
 
 	private void print() {
 		System.out.println("***** TRADING INFO *****");
-		System.out.println("Data info for " + (this.finalList.size() - 1) + " day/s period.");
-		System.out.println(String.format("Average TR: %.2f", this.lastTR));
-		System.out.println(String.format("Current Price: %.2f$", this.curPrice));
-		System.out.println(String.format("Min %s: %.2f$/%.2f%s", index, this.lastMIN, calcPercent(this.lastMIN, this.curPrice), "%"));
-		System.out.println(String.format("Max %s: %.2f$/%.2f%s", index, this.lastMAX, calcPercent(this.lastMAX, this.curPrice), "%"));
+		System.out.println("Data info for " + (this.periodList.size() - 1) + " day/s period.");
+		System.out.println(String.format("Average TR: %.2f", this.periodTR));
+		System.out.println(String.format("Current Price: %.2f$ %s", this.lastPrice, calcPercent(this.lastOpen, this.lastPrice)));
+		System.out.println(String.format(" Min %s: %.2f$ %s", pair, this.periodMIN, calcPercent(this.periodMIN, this.lastPrice)));
+		System.out.println(String.format(" Max %s: %.2f$ %s", pair, this.periodMAX, calcPercent(this.periodMAX, this.lastPrice)));
 	}
 	
-	private double calcPercent(double a, double b) {
-		 double pers = (a * 100.0f) / b;
-		 return -(100.0 - pers);
+	private String calcPercent(double a, double b) {
+		double pers = (a * 100.0f) / b;
+		if (pers > 100.0) {
+			return String.format("(+%.2f%s)", -(100.0 - pers), "%");
+		} else {
+			return String.format("(%.2f%s)", -(100.0 - pers), "%");
+		}
 	}
 	
 	public List<OHLC> getFinalList() {
-		return finalList;
+		return periodList;
 	}
 
 	public void setFinalList(List<OHLC> finalList) {
-		this.finalList = finalList;
+		this.periodList = finalList;
 	}
 
 	public static void main(String args[]) {

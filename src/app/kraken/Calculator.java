@@ -33,7 +33,7 @@ public class Calculator extends Application {
 		List<TradingContracts> unOrderedList = new ArrayList<>();
 
 		for (Integer[] resultList : c.resultList) {
-			TradingContracts temp = new TradingContracts(resultList, k.finalList);
+			TradingContracts temp = new TradingContracts(resultList, k.periodList);
 			unOrderedList.add(temp);
 		}
 
@@ -144,8 +144,8 @@ public class Calculator extends Application {
 		}
 
 		list = new ArrayList<>();
-		min = k.lastMIN;
-		max = k.lastMAX;
+		min = k.periodMIN;
+		max = k.periodMAX;
 
 		Map<String, Double> maxPrice = new LinkedHashMap<>();
 		Map<String, Double> minPrice = new LinkedHashMap<>();
