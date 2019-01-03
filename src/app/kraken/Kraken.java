@@ -22,6 +22,8 @@ import com.google.gson.reflect.TypeToken;
 
 public class Kraken {
 	
+	private final static String KRAKEN = "kraken.com";
+	
 	public int period;
 	public List<OHLC> periodList;
 	public double lastPrice;
@@ -81,7 +83,7 @@ public class Kraken {
 			}
 		} else {
 			try {
-				System.out.println("... Downloading New Data From Kraken");
+				System.out.println("... Downloading New Data From kraken.com");
 				URL url = new URL(strUrl);
 				URLConnection conn = url.openConnection();
 				conn.setDoOutput(true);
@@ -180,7 +182,7 @@ public class Kraken {
 
 	private void print() {
 		System.out.println("***** TRADING INFO *****");
-		System.out.println("Data info for " + (this.periodList.size() - 1) + " day/s period.");
+		System.out.println(String.format("Data info for %d day/s period from %s", (this.periodList.size() - 1), KRAKEN));
 		System.out.println(String.format("Average TR: %.2f", this.periodTR));
 		System.out.println(String.format("Current Price: %.2f$ %s", this.lastPrice, calcPercent(this.lastOpen, this.lastPrice)));
 		System.out.println(String.format(" Min %s: %.2f$ %s", pair, this.periodMIN, calcPercent(this.periodMIN, this.lastPrice)));

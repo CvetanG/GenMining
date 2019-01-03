@@ -11,10 +11,13 @@ import java.util.PriorityQueue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ServiceUnavailableRetryStrategy;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.protocol.HttpContext;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -22,9 +25,10 @@ import com.google.gson.JsonParser;
 
 import app.kraken.OHLC;
 
-public class Kraken_02 {
+public class KrakenMD {
 	
-	private final static int minute = 15; // downloaded files good for this period
+	private final static String KRAKEN = "kraken.com";
+	private final static int MINUTES = 15; // downloaded files good for this period
 	
 	private int period; // days to get Data for
 	private List<OHLC> finalList;
@@ -38,14 +42,14 @@ public class Kraken_02 {
 	private String strUrl;
 	private int pairDec;
 
-	public Kraken_02(String index, int period, int pairDec) {
+	public KrakenMD(String index, int period, int pairDec) {
 		this.index = index.toUpperCase();
 		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + index.toUpperCase() + "&interval=1440";
 		this.period = period;
 		this.pairDec = pairDec;
 	}
 
-	public Kraken_02(PairDec pair, int period) {
+	public KrakenMD(PairDec pair, int period) {
 		this.index = pair.getPair().toUpperCase();
 		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + index.toUpperCase() + "&interval=1440";
 		this.period = period;
@@ -76,15 +80,16 @@ public class Kraken_02 {
 		String line;
 		FileReader fr;
 
-		StringBuilder sb = new StringBuilder();
-		int seconds = minute * 60;
+		
+		int seconds = MINUTES * 60;
 		long periodMillis = (seconds * 1000);
 		long millis = System.currentTimeMillis();
 		boolean check = (file.lastModified() + periodMillis) > millis;
 
 		if (file.exists() && check) {
+			System.out.println("... There is Data For Index: " + index);
+			StringBuilder sb = new StringBuilder();
 			try {
-				System.out.println("... There is Data For Index: " + index);
 				fr = new FileReader(file);
 				rd = new BufferedReader(fr);
 				while ((line = rd.readLine()) != null) {
@@ -96,13 +101,32 @@ public class Kraken_02 {
 				e.printStackTrace();
 			}
 		} else {
+			System.out.println("... Downloading New Data From Kraken");
+			final int reguestCount = 5;
 			try {
-				System.out.println("... Downloading New Data From Kraken");
-				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+//				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+				
+				CloseableHttpClient httpClient = HttpClients.custom()
+				        .setServiceUnavailableRetryStrategy(new ServiceUnavailableRetryStrategy() {
+				            @Override
+				            public boolean retryRequest(
+				                    final HttpResponse response, final int executionCount, final HttpContext context) {
+				                int statusCode = response.getStatusLine().getStatusCode();
+				                return statusCode == 403 && executionCount < reguestCount;
+				            }
+
+				            @Override
+				            public long getRetryInterval() {
+				                return 0;
+				            }
+				        })
+				        .build();
+				
 				HttpUriRequest httpGet = new HttpGet(this.strUrl);
 				System.out.println("Executing request : " + httpGet.getRequestLine());
-				HttpResponse resp = httpClient.execute(httpGet);
+				CloseableHttpResponse resp = httpClient.execute(httpGet);
 				String strResp = MultiDataUtils.responseToString(resp);
+				
 				if (strResp != StringUtils.EMPTY) {
 					JsonObject json = parser.parse(strResp).getAsJsonObject();
 					
@@ -119,6 +143,7 @@ public class Kraken_02 {
 						processData(data);
 					}
 				}
+				resp.close();
 			} catch (Exception e) {
 				System.out.println(e.toString());
 			}
@@ -189,7 +214,7 @@ public class Kraken_02 {
 
 	public void print() {
 		System.out.println("***** TRADING INFO *****");
-		System.out.println("Data info for " + (this.finalList.size() - 1) + " day/s period.");
+		System.out.println(String.format("Data info for %d day/s period from %s", (this.finalList.size() - 1), KRAKEN));
 		System.out.println(String.format("Average TR: %." + pairDec + "f", this.periodTR));
 		System.out.println(String.format("Current Price: %." + pairDec + "f$", this.curPrice));
 		System.out.println(
@@ -229,9 +254,9 @@ public class Kraken_02 {
 		String pair = "XETHXXBT";
 		boolean print = true;
 		int pairDec = 6;
-		Kraken_02 k20 = new Kraken_02(pair, 20, pairDec);
+		KrakenMD k20 = new KrakenMD(pair, 20, pairDec);
 		k20.init(print);
-		Kraken_02 k55 = new Kraken_02(pair, 55, pairDec);
+		KrakenMD k55 = new KrakenMD(pair, 55, pairDec);
 		k55.init(print);
 	}
 }

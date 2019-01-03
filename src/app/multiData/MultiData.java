@@ -8,18 +8,18 @@ import java.util.List;
 public class MultiData {
 
 	private int topNum;
-	private List<Kraken_02> krakenList;
+	private List<KrakenMD> krakenList;
 	
 	public MultiData(List<PairDec> set, int period, int topNum) {
 		this.topNum = topNum;
 		krakenList = new ArrayList<>();
 		for (PairDec pair : set) {
-			krakenList.add(new Kraken_02(pair, period));
+			krakenList.add(new KrakenMD(pair, period));
 		} 
 	}
 	
 	public void init(boolean print) {
-		for (Kraken_02 kr : krakenList) {
+		for (KrakenMD kr : krakenList) {
 			kr.init(print);
 			try {
 				Thread.sleep(800);
@@ -51,19 +51,19 @@ public class MultiData {
 		}
 	}
 	
-	static Comparator<Kraken_02> buyComparator() {
-		return new Comparator<Kraken_02>() {
+	static Comparator<KrakenMD> buyComparator() {
+		return new Comparator<KrakenMD>() {
 			@Override
-			public int compare(Kraken_02 k1, Kraken_02 k2) {
+			public int compare(KrakenMD k1, KrakenMD k2) {
 				return Double.compare(k2.getPercCurMIN(), k1.getPercCurMIN());
 			}
 		};
 	}
 	
-	static Comparator<Kraken_02> sellComparator() {
-		return new Comparator<Kraken_02>() {
+	static Comparator<KrakenMD> sellComparator() {
+		return new Comparator<KrakenMD>() {
 			@Override
-			public int compare(Kraken_02 k1, Kraken_02 k2) {
+			public int compare(KrakenMD k1, KrakenMD k2) {
 				return Double.compare(k1.getPercCurMAX(), k2.getPercCurMAX());
 			}
 		};
