@@ -20,9 +20,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import app.multiData.MultiDataUtils;
+
 public class Kraken {
-	
-	private final static String KRAKEN = "kraken.com";
 	
 	public int period;
 	public List<OHLC> periodList;
@@ -181,12 +181,14 @@ public class Kraken {
 	}
 
 	private void print() {
-		System.out.println("***** TRADING INFO *****");
-		System.out.println(String.format("Data info for %d day/s period from %s", (this.periodList.size() - 1), KRAKEN));
+//		System.out.println(String.format("***** TRADING INFO %s ***** ", MultiDataUtils.readPair(this.pair)));
+//		System.out.println(String.format("%d day/s period from %s", (this.periodList.size() - 1), KRAKEN));
+		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.pair),  (this.periodList.size() - 1), MultiDataUtils.KRAKEN));
 		System.out.println(String.format("Average TR: %.2f", this.periodTR));
-		System.out.println(String.format("Current Price: %.2f$ %s", this.lastPrice, calcPercent(this.lastOpen, this.lastPrice)));
-		System.out.println(String.format(" Min %s: %.2f$ %s", pair, this.periodMIN, calcPercent(this.periodMIN, this.lastPrice)));
-		System.out.println(String.format(" Max %s: %.2f$ %s", pair, this.periodMAX, calcPercent(this.periodMAX, this.lastPrice)));
+		System.out.println(String.format("Open Price: %.2f$", this.lastOpen));
+		System.out.println(String.format("Curr Price: %.2f$ %s", this.lastPrice, calcPercent(this.lastPrice, this.lastOpen)));
+		System.out.println(String.format(" Min Price: %.2f$ %s", this.periodMIN, calcPercent(this.periodMIN, this.lastPrice)));
+		System.out.println(String.format(" Max Price: %.2f$ %s", this.periodMAX, calcPercent(this.periodMAX, this.lastPrice)));
 	}
 	
 	private String calcPercent(double a, double b) {

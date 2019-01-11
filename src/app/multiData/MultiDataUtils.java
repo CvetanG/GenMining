@@ -23,6 +23,8 @@ import com.google.gson.reflect.TypeToken;
 import app.kraken.OHLC;
 
 public class MultiDataUtils {
+	
+	public final static String KRAKEN = "kraken.com";
 
 	public static String readCurruncy(String curr) {
 		Properties prop = new Properties();
@@ -35,7 +37,7 @@ public class MultiDataUtils {
 	}
 	
 	public static String readPair(String pair) {
-		StringBuilder sb = new StringBuilder("Trading ");
+		StringBuilder sb = new StringBuilder();
 		Properties prop = new Properties();
 		try (InputStream input = new FileInputStream("curruncy.properties")) {
 			prop.load(input);
@@ -56,7 +58,7 @@ public class MultiDataUtils {
 				break;
 			}
 		}
-		return sb.toString();
+		return sb.toString().toUpperCase();
 	}
 	
 	public static String responseToString(HttpResponse response) throws IOException {

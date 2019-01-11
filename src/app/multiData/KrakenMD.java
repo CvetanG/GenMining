@@ -27,12 +27,12 @@ import app.kraken.OHLC;
 
 public class KrakenMD {
 	
-	private final static String KRAKEN = "kraken.com";
 	private final static int MINUTES = 15; // downloaded files good for this period
 	
 	private int period; // days to get Data for
 	private List<OHLC> finalList;
 	private double curPrice;
+	private double lastOpen;
 	private double periodTR;
 	private double periodMIN;
 	private double percCurMIN;
@@ -158,12 +158,14 @@ public class KrakenMD {
 				this.finalList.add(MultiDataUtils.jsonElementToOHLC(data.get(i)));
 			}
 			this.curPrice = this.finalList.get(this.period).getClose();
+			this.lastOpen = this.finalList.get(this.period).getOpen();
 		} else {
 			this.period = data.size();
 			for (int i = temp; i < data.size(); i++) {
 				this.finalList.add(MultiDataUtils.jsonElementToOHLC(data.get(i)));
 			}
 			this.curPrice = this.finalList.get(this.period - 1).getClose();
+			this.lastOpen = this.finalList.get(this.period - 1).getOpen();
 		}
 	}
 
@@ -213,20 +215,30 @@ public class KrakenMD {
 	}
 
 	public void print() {
-		System.out.println("***** TRADING INFO *****");
-		System.out.println(String.format("Data info for %d day/s period from %s", (this.finalList.size() - 1), KRAKEN));
+//		System.out.println(String.format("***** TRADING INFO %s *****", MultiDataUtils.readPair(this.index)));
+//		System.out.println(String.format("Data info for %d day/s period from %s", (this.finalList.size() - 1), MultiDataUtils.KRAKEN));
+		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.index),  (this.finalList.size() - 1), MultiDataUtils.KRAKEN));
 		System.out.println(String.format("Average TR: %." + pairDec + "f", this.periodTR));
-		System.out.println(String.format("Current Price: %." + pairDec + "f$", this.curPrice));
+		System.out.println(String.format("Open Price: %." + pairDec + "f$", this.lastOpen));
+		System.out.println(String.format("Curr Price: %." + pairDec + "f$ %s", this.curPrice,  printPro(calcPercent(this.curPrice, this.lastOpen))));
 		System.out.println(
-				String.format("Min %s: %." + pairDec + "f$/%.2f%s", index, this.periodMIN, this.percCurMIN, "%"));
+				String.format(" Min Price: %." + pairDec + "f$ %s", this.periodMIN, printPro(this.percCurMIN)));
 		System.out.println(
-				String.format("Max %s: %." + pairDec + "f$/%.2f%s", index, this.periodMAX, this.percCurMAX, "%"));
-		System.out.println(MultiDataUtils.readPair(this.index).toUpperCase());
+				String.format(" Max Price: %." + pairDec + "f$ %s", this.periodMAX, printPro(this.percCurMAX)));
+//		System.out.println(MultiDataUtils.readPair(this.index).toUpperCase());
 	}
 
 	private double calcPercent(double price, double curPrice) {
 		double pers = (price * 100.0f) / curPrice;
 		return -(100.0 - pers);
+	}
+	
+	private String printPro(double pro) {
+		if (pro > 0.0) {
+			return String.format("(+%.2f%s)", pro, "%");
+		} else {
+			return String.format("(%.2f%s)", pro, "%");
+		}
 	}
 
 	public List<OHLC> getFinalList() {
