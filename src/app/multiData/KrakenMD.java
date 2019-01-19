@@ -176,8 +176,9 @@ public class KrakenMD {
 		double TR2;
 		// TR3 yest close today L
 		double TR3;
-		List<Double> listTRMax = new ArrayList<>();
+//		List<Double> listTRMax = new ArrayList<>();
 		PriorityQueue<Double> pq;
+		Double sum = 0.0;
 
 		for (int i = 1; i < this.finalList.size(); i++) {
 			TR1 = Math.abs(this.finalList.get(i).getHigh() - this.finalList.get(i).getLow());
@@ -188,14 +189,15 @@ public class KrakenMD {
 			pq.add(TR1);
 			pq.add(TR2);
 			pq.add(TR3);
-			listTRMax.add(pq.peek());
+//			listTRMax.add(pq.peek());
+			sum += pq.peek();
 		}
 
-		Double sum = 0.0;
-		for (Double TRMax : listTRMax) {
-			sum += TRMax;
-		}
-		this.periodTR = sum.doubleValue() / listTRMax.size();
+//		for (Double TRMax : listTRMax) {
+//			sum += TRMax;
+//		}
+//		this.periodTR = sum.doubleValue() / listTRMax.size();
+		this.periodTR = sum.doubleValue() / this.finalList.size();
 
 	}
 

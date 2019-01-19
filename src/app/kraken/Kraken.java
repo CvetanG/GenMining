@@ -24,18 +24,21 @@ import app.multiData.MultiDataUtils;
 
 public class Kraken {
 	
-	public int period;
-	public List<OHLC> periodList;
-	public double lastPrice;
-	public double lastOpen;
-	public double periodTR;
-	public double periodMIN;
-	public double periodMAX;
+	private int period;
 	private String pair;
-	public String strUrl;
+	private String strUrl;
+	
+	private List<OHLC> periodList;
+	private double lastPrice;
+	private double lastOpen;
+	private double periodTR;
+	private double periodMIN;
+	private double periodMAX;
 
 	public Kraken(String pair, int period) {
 		this.pair = pair.toUpperCase();
+		// interval is in minutes 1440 = 1day
+		// 1 (default), 5, 15, 30, 60, 240, 1440, 10080, 21600
 		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + pair.toUpperCase() + "&interval=1440";
 		this.period = period;
 	}
@@ -143,8 +146,9 @@ public class Kraken {
 		double TR2;
 		// TR3 yest close today L
 		double TR3;
-		List<Double> listTRMax = new ArrayList<>();
+//		List<Double> listTRMax = new ArrayList<>();
 		PriorityQueue<Double> pq;
+		Double sum = 0.0;
 
 		for (int i = 1; i < this.periodList.size(); i++) {
 			TR1 = Math.abs(this.periodList.get(i).getHigh() - this.periodList.get(i).getLow());
@@ -155,14 +159,15 @@ public class Kraken {
 			pq.add(TR1);
 			pq.add(TR2);
 			pq.add(TR3);
-			listTRMax.add(pq.peek());
+//			listTRMax.add(pq.peek());
+			sum += pq.peek();
 		}
 
-		Double sum = 0.0;
-		for (Double TRMax: listTRMax) {
-			sum += TRMax;
-		}
-		this.periodTR =  sum.doubleValue() / listTRMax.size();
+//		for (Double TRMax: listTRMax) {
+//			sum += TRMax;
+//		}
+//		this.periodTR =  sum.doubleValue() / listTRMax.size();
+		this.periodTR =  sum.doubleValue() / this.periodList.size();
 
 	}
 
@@ -176,7 +181,7 @@ public class Kraken {
 		}
 
 		this.periodMIN = pqMin.peek();
-		this.periodMAX = pqMax.peek();;
+		this.periodMAX = pqMax.peek();
 
 	}
 
@@ -186,12 +191,12 @@ public class Kraken {
 		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.pair),  (this.periodList.size() - 1), MultiDataUtils.KRAKEN));
 		System.out.println(String.format("Average TR: %.2f", this.periodTR));
 		System.out.println(String.format("Open Price: %.2f$", this.lastOpen));
-		System.out.println(String.format("Curr Price: %.2f$ %s", this.lastPrice, calcPercent(this.lastPrice, this.lastOpen)));
-		System.out.println(String.format(" Min Price: %.2f$ %s", this.periodMIN, calcPercent(this.periodMIN, this.lastPrice)));
-		System.out.println(String.format(" Max Price: %.2f$ %s", this.periodMAX, calcPercent(this.periodMAX, this.lastPrice)));
+		System.out.println(String.format("Curr Price: %.2f$ %s", this.lastPrice, calcDiffInPercentage(this.lastPrice, this.lastOpen)));
+		System.out.println(String.format(" Min Price: %.2f$ %s", this.periodMIN, calcDiffInPercentage(this.periodMIN, this.lastPrice)));
+		System.out.println(String.format(" Max Price: %.2f$ %s", this.periodMAX, calcDiffInPercentage(this.periodMAX, this.lastPrice)));
 	}
 	
-	private String calcPercent(double a, double b) {
+	private String calcDiffInPercentage(double a, double b) {
 		double pers = (a * 100.0f) / b;
 		if (pers > 100.0) {
 			return String.format("(+%.2f%s)", -(100.0 - pers), "%");
