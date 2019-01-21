@@ -22,7 +22,7 @@ public class MultiData {
 		for (KrakenMD kr : krakenList) {
 			kr.init(print);
 			try {
-				Thread.sleep(800);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

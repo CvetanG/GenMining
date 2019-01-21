@@ -202,18 +202,22 @@ public class KrakenMD {
 	}
 
 	private void calculateMinMax() {
-		PriorityQueue<Double> pqMin = new PriorityQueue<>(this.finalList.size());
-		PriorityQueue<Double> pqMax = new PriorityQueue<>(this.finalList.size(), Collections.reverseOrder());
-
-		for (OHLC element : this.finalList) {
-			pqMin.add(element.getLow());
-			pqMax.add(element.getHigh());
+		if(this.finalList.size() > 0) {
+			PriorityQueue<Double> pqMin = new PriorityQueue<>(this.finalList.size());
+			PriorityQueue<Double> pqMax = new PriorityQueue<>(this.finalList.size(), Collections.reverseOrder());
+			
+			for (OHLC element : this.finalList) {
+				pqMin.add(element.getLow());
+				pqMax.add(element.getHigh());
+			}
+			
+			this.periodMIN = pqMin.peek();
+			this.percCurMIN = calcPercent(this.periodMIN, this.curPrice);
+			this.periodMAX = pqMax.peek();
+			this.percCurMAX = calcPercent(this.periodMAX, this.curPrice);
+		} else {
+			this.getLastData();
 		}
-
-		this.periodMIN = pqMin.peek();
-		this.percCurMIN = calcPercent(this.periodMIN, this.curPrice);
-		this.periodMAX = pqMax.peek();
-		this.percCurMAX = calcPercent(this.periodMAX, this.curPrice);
 	}
 
 	public void print() {
