@@ -42,6 +42,18 @@ public class Kraken {
 		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + pair.toUpperCase() + "&interval=1440";
 		this.period = period;
 	}
+	
+	public double getPeriodMIN() {
+		return periodMIN;
+	}
+
+	public double getPeriodMAX() {
+		return periodMAX;
+	}
+
+	public List<OHLC> getPeriodList() {
+		return periodList;
+	}
 
 	public void init(){
 		getLastData();
