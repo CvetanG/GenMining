@@ -6,7 +6,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +25,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import app.entities.Utils;
 import app.kraken.OHLC;
 
 public class KrakenMD {
@@ -30,17 +33,18 @@ public class KrakenMD {
 	private final static int MINUTES = 15; // downloaded files good for this period
 	
 	private int period; // days to get Data for
+	private String index;
+	private String strUrl;
+	private int pairDec;
 	private List<OHLC> finalList;
 	private double curPrice;
 	private double lastOpen;
 	private double periodTR;
+	private double periodOC;
 	private double periodMIN;
-	private double percCurMIN;
 	private double periodMAX;
+	private double percCurMIN;
 	private double percCurMAX;
-	private String index;
-	private String strUrl;
-	private int pairDec;
 
 	public KrakenMD(String index, int period, int pairDec) {
 		this.index = index.toUpperCase();
@@ -59,9 +63,33 @@ public class KrakenMD {
 	public void init(boolean print) {
 		getLastData();
 		calculateMinMax();
-		calculateTR();
+		calculateDailyAndPeriodTR();
 		if (print) {
 			print();
+		}
+	}
+
+	private void printObjects(int days) {
+		int end = this.finalList.size(); // 20
+		int start = end - days; // 13
+		for (int i = start; i < end; i++) {
+//			printObject(this.finalList.get(i).getDailyTR(), start, i, end, "DailyTR: ");
+			printObject(this.finalList.get(i).getOC(), end, i, start, "DailyOC: ");
+		}
+		System.out.println();
+	}
+
+	private void printObject(double d, int end, int i, int start, String text) {
+		if (i == start) {
+			System.out.print(text);
+		}
+		if (d > 0.0) {
+			System.out.print(String.format("+%." + pairDec + "f", d));
+		} else {
+			System.out.print(String.format("%." + pairDec + "f", d));
+		}
+		if (i != end - 1) {
+			System.out.print(", ");
 		}
 	}
 
@@ -169,38 +197,56 @@ public class KrakenMD {
 		}
 	}
 
-	private void calculateTR() {
-		// TR1 today H/L
-		double TR1;
-		// TR2 yest close today H
-		double TR2;
-		// TR3 yest close today L
-		double TR3;
+	private void calculateDailyAndPeriodTR() {
 //		List<Double> listTRMax = new ArrayList<>();
 		PriorityQueue<Double> pq;
-		Double sum = 0.0;
-
+		double sumTR = 0.0;
+		double sumOC = 0.0;
+		
 		for (int i = 1; i < this.finalList.size(); i++) {
-			TR1 = Math.abs(this.finalList.get(i).getHigh() - this.finalList.get(i).getLow());
-			TR2 = Math.abs(this.finalList.get(i - 1).getClose() - this.finalList.get(i).getHigh());
-			TR3 = Math.abs(this.finalList.get(i - 1).getClose() - this.finalList.get(i).getLow());
-
+			// TR1 today H-L
+			double TR1;
+			// TR2 yest close - today H
+			double TR2;
+			// TR3 yest close - today L
+			double TR3;
+			// OC today C - O
+			double OC;
+			TR1 = this.finalList.get(i).getHigh() - this.finalList.get(i).getLow();
+			TR2 = this.finalList.get(i - 1).getClose() - this.finalList.get(i).getHigh();
+			TR3 = this.finalList.get(i - 1).getClose() - this.finalList.get(i).getLow();
+			OC = this.finalList.get(i).getClose() - this.finalList.get(i).getOpen() ;
+			
+//			absTR1 = Math.abs(TR1);
+//			absTR2 = Math.abs(TR2);
+//			absTR3 = Math.abs(TR3);
+			
+			Map<Double, Double> m = new HashMap<>();
+			m.put(Math.abs(TR1), TR1);
+			m.put(Math.abs(TR2), TR2);
+			m.put(Math.abs(TR3), TR3);
+			
 			pq = new PriorityQueue<>(3, Collections.reverseOrder());
-			pq.add(TR1);
-			pq.add(TR2);
-			pq.add(TR3);
+			pq.add(Math.abs(TR1));
+			pq.add(Math.abs(TR2));
+			pq.add(Math.abs(TR3));
 //			listTRMax.add(pq.peek());
-			sum += pq.peek();
+			double highest = pq.peek();
+			sumTR += highest;
+			sumOC += Math.abs(OC);
+			finalList.get(i).setDailyTR(m.get(highest));
+			finalList.get(i).setOC(OC);
 		}
 
 //		for (Double TRMax : listTRMax) {
 //			sum += TRMax;
 //		}
 //		this.periodTR = sum.doubleValue() / listTRMax.size();
-		this.periodTR = sum.doubleValue() / this.finalList.size();
-
+		this.periodTR = sumTR / (this.finalList.size() - 1); // because we get one additional day only for its closing value
+		this.periodOC = sumOC / (this.finalList.size() - 1); 
+		
 	}
-
+	
 	private void calculateMinMax() {
 		if(this.finalList.size() > 0) {
 			PriorityQueue<Double> pqMin = new PriorityQueue<>(this.finalList.size());
@@ -212,9 +258,9 @@ public class KrakenMD {
 			}
 			
 			this.periodMIN = pqMin.peek();
-			this.percCurMIN = calcPercent(this.periodMIN, this.curPrice);
+			this.percCurMIN = Utils.calcPercentage(this.periodMIN, this.curPrice);
 			this.periodMAX = pqMax.peek();
-			this.percCurMAX = calcPercent(this.periodMAX, this.curPrice);
+			this.percCurMAX = Utils.calcPercentage(this.periodMAX, this.curPrice);
 		} else {
 			System.out.println("...Executing Request Again: " + this.strUrl);
 			this.getLastData();
@@ -226,27 +272,17 @@ public class KrakenMD {
 //		System.out.println(String.format("***** TRADING INFO %s *****", MultiDataUtils.readPair(this.index)));
 //		System.out.println(String.format("Data info for %d day/s period from %s", (this.finalList.size() - 1), MultiDataUtils.KRAKEN));
 		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.index),  (this.finalList.size() - 1), MultiDataUtils.KRAKEN));
+		int d = 7;
+		printObjects(d);
+		System.out.println(String.format("Average OC: %." + pairDec + "f", this.periodOC));
 		System.out.println(String.format("Average TR: %." + pairDec + "f", this.periodTR));
 		System.out.println(String.format("Open Price: %." + pairDec + "f$", this.lastOpen));
-		System.out.println(String.format("Curr Price: %." + pairDec + "f$ %s", this.curPrice,  printPro(calcPercent(this.curPrice, this.lastOpen))));
+		System.out.println(String.format("Curr Price: %." + pairDec + "f$ %s", this.curPrice, Utils.calcPrintPercentage(this.curPrice, this.lastOpen)));
 		System.out.println(
-				String.format(" Min Price: %." + pairDec + "f$ %s", this.periodMIN, printPro(this.percCurMIN)));
+				String.format(" Min Price: %." + pairDec + "f$ %s", this.periodMIN, Utils.printPercentage(this.percCurMIN)));
 		System.out.println(
-				String.format(" Max Price: %." + pairDec + "f$ %s", this.periodMAX, printPro(this.percCurMAX)));
+				String.format(" Max Price: %." + pairDec + "f$ %s", this.periodMAX, Utils.printPercentage(this.percCurMAX)));
 //		System.out.println(MultiDataUtils.readPair(this.index).toUpperCase());
-	}
-
-	private double calcPercent(double price, double curPrice) {
-		double pers = (price * 100.0f) / curPrice;
-		return -(100.0 - pers);
-	}
-	
-	private String printPro(double pro) {
-		if (pro > 0.0) {
-			return String.format("(+%.2f%s)", pro, "%");
-		} else {
-			return String.format("(%.2f%s)", pro, "%");
-		}
 	}
 
 	public List<OHLC> getFinalList() {

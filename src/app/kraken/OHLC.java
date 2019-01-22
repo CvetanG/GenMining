@@ -9,6 +9,8 @@ public class OHLC {
 	double vwap;
 	double volume;
 	double count;
+	double dailyTR;
+	double OC;
 	
 	public String getTime() {
 		return time;
@@ -72,6 +74,22 @@ public class OHLC {
 	
 	public void setCount(double count) {
 		this.count = count;
+	}
+	
+	public double getDailyTR() {
+		return dailyTR;
+	}
+
+	public void setDailyTR(double dailyTR) {
+		this.dailyTR = dailyTR;
+	}
+	
+	public double getOC() {
+		return OC;
+	}
+
+	public void setOC(double oC) {
+		OC = oC;
 	}
 
 	@Override

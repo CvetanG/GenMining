@@ -7,7 +7,7 @@ public class ExampleDate {
 	
 	public static String myDayOfWeek(int dayOfWeek) {
 //		System.out.println(dayOfWeek);
-		String dOW = null;
+		String dOW = "";
 		switch (dayOfWeek) {
 		case 2:
 			return dOW = "пон";

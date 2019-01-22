@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import app.entities.Utils;
 import app.multiData.MultiDataUtils;
 
 public class Kraken {
@@ -203,19 +204,11 @@ public class Kraken {
 		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.pair),  (this.periodList.size() - 1), MultiDataUtils.KRAKEN));
 		System.out.println(String.format("Average TR: %.2f", this.periodTR));
 		System.out.println(String.format("Open Price: %.2f$", this.lastOpen));
-		System.out.println(String.format("Curr Price: %.2f$ %s", this.lastPrice, calcDiffInPercentage(this.lastPrice, this.lastOpen)));
-		System.out.println(String.format(" Min Price: %.2f$ %s", this.periodMIN, calcDiffInPercentage(this.periodMIN, this.lastPrice)));
-		System.out.println(String.format(" Max Price: %.2f$ %s", this.periodMAX, calcDiffInPercentage(this.periodMAX, this.lastPrice)));
+		System.out.println(String.format("Curr Price: %.2f$ %s", this.lastPrice, Utils.calcPrintPercentage(this.lastPrice, this.lastOpen)));
+		System.out.println(String.format(" Min Price: %.2f$ %s", this.periodMIN, Utils.calcPrintPercentage(this.periodMIN, this.lastPrice)));
+		System.out.println(String.format(" Max Price: %.2f$ %s", this.periodMAX, Utils.calcPrintPercentage(this.periodMAX, this.lastPrice)));
 	}
 	
-	private String calcDiffInPercentage(double a, double b) {
-		double pers = (a * 100.0f) / b;
-		if (pers > 100.0) {
-			return String.format("(+%.2f%s)", -(100.0 - pers), "%");
-		} else {
-			return String.format("(%.2f%s)", -(100.0 - pers), "%");
-		}
-	}
 	
 	public List<OHLC> getFinalList() {
 		return periodList;
