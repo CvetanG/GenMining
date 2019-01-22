@@ -216,7 +216,9 @@ public class KrakenMD {
 			this.periodMAX = pqMax.peek();
 			this.percCurMAX = calcPercent(this.periodMAX, this.curPrice);
 		} else {
+			System.out.println("...Executing Request Again: " + this.strUrl);
 			this.getLastData();
+			this.calculateMinMax();
 		}
 	}
 
