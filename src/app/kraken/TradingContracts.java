@@ -2,6 +2,8 @@ package app.kraken;
 
 import java.util.List;
 
+import app.entities.OHLC;
+
 public class TradingContracts{
 //	public class TradingContracts implements Cloneable, Comparable<TradingContracts> {
 	

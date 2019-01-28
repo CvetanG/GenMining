@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
+	
+	private Utils() {
+		throw new AssertionError();
+	}
+	
 	public static String duration(long startTime, long endTime) {
 		long totalTime = endTime - startTime;
 		

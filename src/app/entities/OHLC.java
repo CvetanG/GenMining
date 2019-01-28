@@ -1,4 +1,4 @@
-package app.kraken;
+package app.entities;
 
 public class OHLC {
 	String time;

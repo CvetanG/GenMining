@@ -1,4 +1,4 @@
-package app.multiData;
+package app.entities;
 
 public class PairDec {
 	

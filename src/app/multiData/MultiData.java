@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import app.entities.PairDec;
+
 public class MultiData {
 
 	private int topNum;

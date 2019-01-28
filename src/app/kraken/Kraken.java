@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import app.entities.OHLC;
 import app.entities.Utils;
 import app.multiData.MultiDataUtils;
 
@@ -37,25 +38,14 @@ public class Kraken {
 	private double periodMAX;
 
 	public Kraken(String pair, int period) {
-		this.pair = pair.toUpperCase();
+		this.setPair(pair.toUpperCase());
 		// interval is in minutes 1440 = 1day
 		// 1 (default), 5, 15, 30, 60, 240, 1440, 10080, 21600
-		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + pair.toUpperCase() + "&interval=1440";
-		this.period = period;
+		this.setStrUrl("https://api.kraken.com/0/public/OHLC?pair=" + pair.toUpperCase() + "&interval=1440");
+		this.setPeriod(period);
+		this.setPeriodList(new ArrayList<OHLC>());
 	}
 	
-	public double getPeriodMIN() {
-		return periodMIN;
-	}
-
-	public double getPeriodMAX() {
-		return periodMAX;
-	}
-
-	public List<OHLC> getPeriodList() {
-		return periodList;
-	}
-
 	public void init(){
 		getLastData();
 		calculateMinMax();
@@ -66,10 +56,9 @@ public class Kraken {
 	private void getLastData() {
 		String element = "result";
 		StringBuilder fileUrl = new StringBuilder("market_data/");
-		fileUrl.append(pair);
+		fileUrl.append(getPair());
 		fileUrl.append("_dataList.json");
 		File file = new File(fileUrl.toString());
-		this.periodList = new ArrayList<OHLC>();
 
 		BufferedReader rd;
 		OutputStreamWriter wr;
@@ -100,7 +89,7 @@ public class Kraken {
 		} else {
 			try {
 				System.out.println("... Downloading New Data From kraken.com");
-				URL url = new URL(strUrl);
+				URL url = new URL(getStrUrl());
 				URLConnection conn = url.openConnection();
 				conn.setDoOutput(true);
 				wr = new OutputStreamWriter(conn.getOutputStream());
@@ -117,7 +106,7 @@ public class Kraken {
 				JsonObject json = parser.parse(sb.toString()).getAsJsonObject();
 				JsonObject result = json.getAsJsonObject(element);
 
-				data = result.getAsJsonArray(pair);
+				data = result.getAsJsonArray(getPair());
 
 				FileWriter  fw = new FileWriter(file, false);
 
@@ -127,13 +116,13 @@ public class Kraken {
 				System.out.println(e.toString());
 			}
 		}
-		int temp = data.size() - (period + 1);
+		int temp = data.size() - (getPeriod() + 1);
 		
 		for (int i = temp; i < data.size(); i++) {
-			this.periodList.add(jsonElementToOHLC(gson, data.get(i)));
+			this.getPeriodList().add(jsonElementToOHLC(gson, data.get(i)));
 		}
-		this.lastPrice =  this.periodList.get(period).getClose();
-		this.lastOpen =  this.periodList.get(period).getOpen();
+		this.setLastPrice(this.getPeriodList().get(getPeriod()).getClose());
+		this.setLastOpen(this.getPeriodList().get(getPeriod()).getOpen());
 	}
 
 	private OHLC jsonElementToOHLC(Gson gson, JsonElement jsonElement) {
@@ -163,10 +152,10 @@ public class Kraken {
 		PriorityQueue<Double> pq;
 		Double sum = 0.0;
 
-		for (int i = 1; i < this.periodList.size(); i++) {
-			TR1 = Math.abs(this.periodList.get(i).getHigh() - this.periodList.get(i).getLow());
-			TR2 = Math.abs(this.periodList.get(i - 1).getClose() - this.periodList.get(i).getHigh());
-			TR3 = Math.abs(this.periodList.get(i - 1).getClose() - this.periodList.get(i).getLow());
+		for (int i = 1; i < this.getPeriodList().size(); i++) {
+			TR1 = Math.abs(this.getPeriodList().get(i).getHigh() - this.getPeriodList().get(i).getLow());
+			TR2 = Math.abs(this.getPeriodList().get(i - 1).getClose() - this.getPeriodList().get(i).getHigh());
+			TR3 = Math.abs(this.getPeriodList().get(i - 1).getClose() - this.getPeriodList().get(i).getLow());
 
 			pq = new PriorityQueue<>(3, Collections.reverseOrder());
 			pq.add(TR1);
@@ -180,44 +169,35 @@ public class Kraken {
 //			sum += TRMax;
 //		}
 //		this.periodTR =  sum.doubleValue() / listTRMax.size();
-		this.periodTR =  sum.doubleValue() / this.periodList.size();
+		this.setPeriodTR(sum.doubleValue() / this.getPeriodList().size());
 
 	}
 
 	private void calculateMinMax() {
-		PriorityQueue<Double> pqMin = new PriorityQueue<>(this.periodList.size());
-		PriorityQueue<Double> pqMax = new PriorityQueue<>(this.periodList.size(), Collections.reverseOrder());
+		PriorityQueue<Double> pqMin = new PriorityQueue<>(this.getPeriodList().size());
+		PriorityQueue<Double> pqMax = new PriorityQueue<>(this.getPeriodList().size(), Collections.reverseOrder());
 
-		for (OHLC element : this.periodList) {
+		for (OHLC element : this.getPeriodList()) {
 			pqMin.add(element.getLow());
 			pqMax.add(element.getHigh());
 		}
 
-		this.periodMIN = pqMin.peek();
-		this.periodMAX = pqMax.peek();
+		this.setPeriodMIN(pqMin.peek());
+		this.setPeriodMAX(pqMax.peek());
 
 	}
 
 	private void print() {
 //		System.out.println(String.format("***** TRADING INFO %s ***** ", MultiDataUtils.readPair(this.pair)));
 //		System.out.println(String.format("%d day/s period from %s", (this.periodList.size() - 1), KRAKEN));
-		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.pair),  (this.periodList.size() - 1), MultiDataUtils.KRAKEN));
-		System.out.println(String.format("Average TR: %.2f", this.periodTR));
-		System.out.println(String.format("Open Price: %.2f$", this.lastOpen));
-		System.out.println(String.format("Curr Price: %.2f$ %s", this.lastPrice, Utils.calcPrintPercentage(this.lastPrice, this.lastOpen)));
-		System.out.println(String.format(" Min Price: %.2f$ %s", this.periodMIN, Utils.calcPrintPercentage(this.periodMIN, this.lastPrice)));
-		System.out.println(String.format(" Max Price: %.2f$ %s", this.periodMAX, Utils.calcPrintPercentage(this.periodMAX, this.lastPrice)));
+		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.getPair()),  (this.getPeriodList().size() - 1), MultiDataUtils.KRAKEN));
+		System.out.println(String.format("Average TR: %.2f", this.getPeriodTR()));
+		System.out.println(String.format("Open Price: %.2f$", this.getLastOpen()));
+		System.out.println(String.format("Curr Price: %.2f$ %s", this.getLastPrice(), Utils.calcPrintPercentage(this.getLastPrice(), this.getLastOpen())));
+		System.out.println(String.format(" Min Price: %.2f$ %s", this.getPeriodMIN(), Utils.calcPrintPercentage(this.getPeriodMIN(), this.getLastPrice())));
+		System.out.println(String.format(" Max Price: %.2f$ %s", this.getPeriodMAX(), Utils.calcPrintPercentage(this.getPeriodMAX(), this.getLastPrice())));
 	}
 	
-	
-	public List<OHLC> getFinalList() {
-		return periodList;
-	}
-
-	public void setFinalList(List<OHLC> finalList) {
-		this.periodList = finalList;
-	}
-
 	public static void main(String args[]) {
 		String pair = "XXMRZUSD";
 		Kraken k10 = new Kraken(pair, 10);
@@ -226,5 +206,85 @@ public class Kraken {
 		k20.init();
 		Kraken k55 = new Kraken(pair, 55);
 		k55.init();
+	}
+	
+	public double getPeriodMIN() {
+		return periodMIN;
+	}
+
+	public double getPeriodMAX() {
+		return periodMAX;
+	}
+
+	public List<OHLC> getPeriodList() {
+		return periodList;
+	}
+	
+	public List<OHLC> getFinalList() {
+		return getPeriodList();
+	}
+
+	public void setFinalList(List<OHLC> finalList) {
+		this.setPeriodList(finalList);
+	}
+
+	public double getLastPrice() {
+		return lastPrice;
+	}
+
+	public void setLastPrice(double lastPrice) {
+		this.lastPrice = lastPrice;
+	}
+
+	public int getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(int period) {
+		this.period = period;
+	}
+
+	public double getLastOpen() {
+		return lastOpen;
+	}
+
+	public void setLastOpen(double lastOpen) {
+		this.lastOpen = lastOpen;
+	}
+
+	public String getStrUrl() {
+		return strUrl;
+	}
+
+	public void setStrUrl(String strUrl) {
+		this.strUrl = strUrl;
+	}
+
+	public void setPeriodList(List<OHLC> periodList) {
+		this.periodList = periodList;
+	}
+
+	public String getPair() {
+		return pair;
+	}
+
+	public void setPair(String pair) {
+		this.pair = pair;
+	}
+
+	public double getPeriodTR() {
+		return periodTR;
+	}
+
+	public void setPeriodTR(double periodTR) {
+		this.periodTR = periodTR;
+	}
+
+	public void setPeriodMIN(double periodMIN) {
+		this.periodMIN = periodMIN;
+	}
+
+	public void setPeriodMAX(double periodMAX) {
+		this.periodMAX = periodMAX;
 	}
 }

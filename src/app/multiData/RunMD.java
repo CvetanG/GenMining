@@ -15,6 +15,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import app.entities.PairDec;
+
 public class RunMD {
 
 	private final static String allPairsUrl = "https://api.kraken.com/0/public/AssetPairs";
@@ -27,8 +29,12 @@ public class RunMD {
 		pairsRemove.add(".d");
 		pairsRemove.add("USDT");
 	}
+	
+	private RunMD() {
+		throw new AssertionError();
+	}
 
-	public static List<PairDec> getAllPairs() {
+	private static List<PairDec> getAllPairs() {
 		List<PairDec> pairs = new ArrayList<>();
 		JsonParser parser = new JsonParser();
 		String element = "result";
@@ -60,7 +66,7 @@ public class RunMD {
 		return pairs;
 	}
 	
-	public static List<PairDec> filterPairs(List<PairDec> initialPairs) {
+	private static List<PairDec> filterPairs(List<PairDec> initialPairs) {
 		List<PairDec> filteredPairs = new ArrayList<>();
 		for (PairDec pair : initialPairs) {
 			if (!pairsOnly.isEmpty()) {
@@ -93,7 +99,7 @@ public class RunMD {
 	
 
 	public static void main(String[] args) {
-		List<PairDec> pairs = getAllPairs();
+		List<PairDec> pairs = RunMD.getAllPairs();
 		System.out.println(pairs.size());
 		
 //		for (PairDec p : pairs) {
@@ -102,7 +108,7 @@ public class RunMD {
 		
 		int period = 55;
 		int topNum = 5;
-		List<PairDec> filteredPairs = filterPairs(pairs);
+		List<PairDec> filteredPairs = RunMD.filterPairs(pairs);
 		System.out.println(filteredPairs.size());
 		
 //		for (PairDec p : filteredPairs) {

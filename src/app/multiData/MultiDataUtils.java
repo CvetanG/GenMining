@@ -20,9 +20,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
-import app.kraken.OHLC;
+import app.entities.OHLC;
 
 public class MultiDataUtils {
+	
+	private MultiDataUtils() {
+		throw new AssertionError();
+	}
 	
 	public final static String KRAKEN = "kraken.com";
 
@@ -99,7 +103,7 @@ public class MultiDataUtils {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(readCurruncy("BCH"));
-		System.out.println(readCurruncy("DASH"));
+		System.out.println(MultiDataUtils.readCurruncy("BCH"));
+		System.out.println(MultiDataUtils.readCurruncy("DASH"));
 	}
 }
