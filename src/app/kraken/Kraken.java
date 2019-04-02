@@ -22,7 +22,7 @@ import com.google.gson.reflect.TypeToken;
 
 import app.entities.OHLC;
 import app.entities.Utils;
-import app.multiData.MultiDataUtils;
+import app.multidata.MultiDataUtils;
 
 public class Kraken {
 	

@@ -1,4 +1,4 @@
-package app.multiData;
+package app.multidata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +19,13 @@ import app.entities.PairDec;
 
 public class RunMD {
 
-	private final static String allPairsUrl = "https://api.kraken.com/0/public/AssetPairs";
+	private static final String ALL_PAIRS_URL = "https://api.kraken.com/0/public/AssetPairs";
 	private static List<String> pairsOnly = new ArrayList<>();
 	private static List<String> pairsRemove = new ArrayList<>();
 	static {
 		pairsOnly.add("XMR");
 		pairsOnly.add("USD");
+		pairsOnly.add("XRP");
 		
 		pairsRemove.add(".d");
 		pairsRemove.add("USDT");
@@ -42,7 +43,7 @@ public class RunMD {
 		try {
 
 			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-			HttpUriRequest httpGet = new HttpGet(allPairsUrl);
+			HttpUriRequest httpGet = new HttpGet(ALL_PAIRS_URL);
 			System.out.println("Executing request : " + httpGet.getRequestLine());
 			HttpResponse resp = httpClient.execute(httpGet);
 			String strResp = MultiDataUtils.responseToString(resp);

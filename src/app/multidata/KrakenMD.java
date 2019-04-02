@@ -1,4 +1,4 @@
-package app.multiData;
+package app.multidata;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,41 +30,26 @@ import app.kraken.Kraken;
 
 public class KrakenMD extends Kraken {
 	
-	private final static int MINUTES = 15; // downloaded files good for this period
+	private static final int MINUTES = 15; // downloaded files good for this period
 	
-//	private int period; // days to get Data for
-//	private String pair;
-//	private String strUrl;
 	private int pairDec;
-//	private List<OHLC> periodList;
-//	private double lastPrice;
-//	private double lastOpen;
-//	private double periodTR;
 	private double periodOC;
-//	private double periodMIN;
-//	private double periodMAX;
 	private double percCurMIN;
 	private double percCurMAX;
 
 	public KrakenMD(String index, int period, int pairDec) {
-//		this.pair = index.toUpperCase();
-//		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + index.toUpperCase() + "&interval=1440";
-//		this.period = period;
 		super(index, period);
 		this.pairDec = pairDec;
 	}
 	
 	public KrakenMD(PairDec pairDec, int period) {
-//		this.pair = pairDec.getPair().toUpperCase();
-//		this.strUrl = "https://api.kraken.com/0/public/OHLC?pair=" + pairDec.toUpperCase() + "&interval=1440";
-//		this.period = period;
 		super(pairDec.getPair().toUpperCase(), period);
 		this.pairDec = pairDec.getDec();
 	}
 
 	void init(boolean print) {
-		getLastData();
-		calculateMinMax();
+		getLastDataMD();
+		calculateMinMaxMD();
 		calculateDailyAndPeriodTR();
 		if (print) {
 			print();
@@ -94,8 +79,8 @@ public class KrakenMD extends Kraken {
 			System.out.print(", ");
 		}
 	}
-
-	private void getLastData() {
+	
+	private void getLastDataMD() {
 		String element = "result";
 
 		JsonParser parser = new JsonParser();
@@ -104,12 +89,9 @@ public class KrakenMD extends Kraken {
 		fileUrl.append("_dataList.json");
 		File file = new File(fileUrl.toString());
 
-		BufferedReader rd;
 		JsonArray data = null;
 		String line;
-		FileReader fr;
 
-		
 		int seconds = MINUTES * 60;
 		long periodMillis = (seconds * 1000);
 		long millis = System.currentTimeMillis();
@@ -118,9 +100,8 @@ public class KrakenMD extends Kraken {
 		if (file.exists() && check) {
 			System.out.println("... There is Data For Index: " + getPair());
 			StringBuilder sb = new StringBuilder();
-			try {
-				fr = new FileReader(file);
-				rd = new BufferedReader(fr);
+			try (FileReader fr = new FileReader(file);
+				  BufferedReader rd = new BufferedReader(fr)) {
 				while ((line = rd.readLine()) != null) {
 					sb.append(line);
 				}
@@ -248,8 +229,8 @@ public class KrakenMD extends Kraken {
 		
 	}
 	
-	private void calculateMinMax() {
-		if(this.getPeriodList().size() > 0) {
+	private void calculateMinMaxMD() {
+		if(!this.getPeriodList().isEmpty()) {
 			PriorityQueue<Double> pqMin = new PriorityQueue<>(this.getPeriodList().size());
 			PriorityQueue<Double> pqMax = new PriorityQueue<>(this.getPeriodList().size(), Collections.reverseOrder());
 			
@@ -264,8 +245,8 @@ public class KrakenMD extends Kraken {
 			this.percCurMAX = Utils.calcPercentage(this.getPeriodMAX(), this.getLastPrice());
 		} else {
 			System.out.println("...Executing Request Again: " + this.getStrUrl());
-			this.getLastData();
-			this.calculateMinMax();
+			this.getLastDataMD();
+			this.calculateMinMaxMD();
 		}
 	}
 	

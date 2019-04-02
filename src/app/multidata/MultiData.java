@@ -1,4 +1,4 @@
-package app.multiData;
+package app.multidata;
 
 import java.util.ArrayList;
 import java.util.Collections;

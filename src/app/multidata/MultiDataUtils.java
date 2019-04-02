@@ -1,4 +1,4 @@
-package app.multiData;
+package app.multidata;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -28,7 +28,7 @@ public class MultiDataUtils {
 		throw new AssertionError();
 	}
 	
-	public final static String KRAKEN = "kraken.com";
+	public static final String KRAKEN = "kraken.com";
 
 	public static String readCurruncy(String curr) {
 		Properties prop = new Properties();
