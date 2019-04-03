@@ -120,7 +120,7 @@ public class LineChartSample extends Application {
         final NumberAxis yAxis = new NumberAxis();
          xAxis.setLabel(this.xAxisLabel);
         final LineChart<String,Number> lineChart = 
-                new LineChart<String,Number>(xAxis,yAxis);
+                new LineChart<>(xAxis,yAxis);
        
         lineChart.setTitle(this.lineChartTitle);
         

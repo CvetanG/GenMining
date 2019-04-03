@@ -11,10 +11,10 @@ import app.entities.Utils;
 
 public class WebSitesParser {
 	
-	private static final int timeout = 50000;
+	private static final int TIMEOUT = 50000;
 	private static WebSitesParser instance;
 	
-	public GMRowEntry rowEntry;
+	private GMRowEntry rowEntry;
     
 	public WebSitesParser(){
 		this.rowEntry = new GMRowEntry();
@@ -41,7 +41,7 @@ public class WebSitesParser {
 		String myUrl = "https://www.coinwarz.com/cryptocurrency/coins/monero/";
 		
 		Document doc = Jsoup.connect(myUrl)
-				.timeout(timeout).validateTLSCertificates(false)
+				.timeout(TIMEOUT).validateTLSCertificates(false)
 				.get();
 		
 		String XMR_USD;
@@ -75,7 +75,7 @@ public class WebSitesParser {
 		String myUrl = "https://coinmarketcap.com/currencies/monero/";
 		
 		Document doc = Jsoup.connect(myUrl)
-				.timeout(timeout).validateTLSCertificates(false)
+				.timeout(TIMEOUT).validateTLSCertificates(false)
 				.get();
 		
 		long marketCap;

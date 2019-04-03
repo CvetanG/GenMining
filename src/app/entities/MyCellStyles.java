@@ -9,12 +9,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 public class MyCellStyles {
 	
-	Map<String, CellStyle> myCellStyles;
+	private Map<String, CellStyle> cellStyles;
 	
-	Workbook wb;
+	private Workbook wb;
 	
 	public MyCellStyles(Workbook wb) {
-		myCellStyles = new HashMap<String, CellStyle>();
+		cellStyles = new HashMap<>();
 		
 		CreationHelper createHelper = wb.getCreationHelper();
 		
@@ -42,21 +42,21 @@ public class MyCellStyles {
 
 		CellStyle csDef = wb.createCellStyle();
 		
-		myCellStyles.put("csDateRight", csDateRight);
-		myCellStyles.put("csHour", csHour);
-		myCellStyles.put("csPerc", csPerc);
-		myCellStyles.put("csUSD", csUSD);
-		myCellStyles.put("csUSDSep", csUSDSep);
-		myCellStyles.put("csDef", csDef);
+		cellStyles.put("csDateRight", csDateRight);
+		cellStyles.put("csHour", csHour);
+		cellStyles.put("csPerc", csPerc);
+		cellStyles.put("csUSD", csUSD);
+		cellStyles.put("csUSDSep", csUSDSep);
+		cellStyles.put("csDef", csDef);
 		
 	}
 
 	public Map<String, CellStyle> getMyCellStyles() {
-		return myCellStyles;
+		return cellStyles;
 	}
 
 	public void setMyCellStyles(Map<String, CellStyle> myCellStyles) {
-		this.myCellStyles = myCellStyles;
+		this.cellStyles = myCellStyles;
 	}
 
 	public Workbook getWb() {

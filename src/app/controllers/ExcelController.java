@@ -50,12 +50,11 @@ public class ExcelController {
 		int newRow = 0;
 		for (Row row : worksheet) {
 			for (Cell cell : row) {
-				if (cell.getCellType() != Cell.CELL_TYPE_BLANK) {
-					if (cell.getCellType() != Cell.CELL_TYPE_STRING ||
-							cell.getStringCellValue().length() > 0) {
-						newRow++;
-						break;
-					}
+				if (cell.getCellType() != Cell.CELL_TYPE_BLANK
+						&& (cell.getCellType() != Cell.CELL_TYPE_STRING
+						|| cell.getStringCellValue().length() > 0)) {
+					newRow++;
+					break;
 				}
 			}
 		}

@@ -7,14 +7,14 @@ import app.entities.OHLC;
 public class TradingContracts{
 //	public class TradingContracts implements Cloneable, Comparable<TradingContracts> {
 	
-	public final double USDstart = 0;
-	public final double XMRstart = 0.4;
+	private static final double USD_START = 0;
+	private static final double XMR_START = 0.4;
 	
-	public double USD = USDstart;
-	public double XMR = XMRstart;
+	private double USD = USD_START;
+	private double XMR = XMR_START;
 
-	public Integer[] combList;
-	public List<OHLC> krakenData;
+	private Integer[] combList;
+	private List<OHLC> krakenData;
 	
 	public TradingContracts(Integer[] combList, List<OHLC> krakenData) {
 		this.combList = combList;
@@ -57,8 +57,8 @@ public class TradingContracts{
 	}
 	
 	public void printTrading(){
-		this.USD = USDstart;
-		this.XMR = XMRstart;
+		this.USD = USD_START;
+		this.XMR = XMR_START;
 		trade(true);
 	}
 

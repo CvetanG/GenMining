@@ -81,7 +81,6 @@ public class KrakenMD extends Kraken {
 	}
 	
 	private void getLastDataMD() {
-		String element = "result";
 
 		JsonParser parser = new JsonParser();
 		StringBuilder fileUrl = new StringBuilder("market_data/");
@@ -89,74 +88,83 @@ public class KrakenMD extends Kraken {
 		fileUrl.append("_dataList.json");
 		File file = new File(fileUrl.toString());
 
-		JsonArray data = null;
-		String line;
-
 		int seconds = MINUTES * 60;
 		long periodMillis = (seconds * 1000);
 		long millis = System.currentTimeMillis();
 		boolean check = (file.lastModified() + periodMillis) > millis;
 
 		if (file.exists() && check) {
-			System.out.println("... There is Data For Index: " + getPair());
-			StringBuilder sb = new StringBuilder();
-			try (FileReader fr = new FileReader(file);
-				  BufferedReader rd = new BufferedReader(fr)) {
-				while ((line = rd.readLine()) != null) {
-					sb.append(line);
-				}
-				data = parser.parse(sb.toString()).getAsJsonArray();
-				processData(data);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			getExistingData(parser, file);
 		} else {
-			System.out.println("... Downloading New Data From Kraken");
-			final int reguestCount = 5;
-			try {
-//				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-				
-				CloseableHttpClient httpClient = HttpClients.custom()
-				        .setServiceUnavailableRetryStrategy(new ServiceUnavailableRetryStrategy() {
-				            @Override
-				            public boolean retryRequest(
-				                    final HttpResponse response, final int executionCount, final HttpContext context) {
-				                int statusCode = response.getStatusLine().getStatusCode();
-				                return statusCode == 403 && executionCount < reguestCount;
-				            }
+			getWebData(parser, file);
+		}
+	}
 
-				            @Override
-				            public long getRetryInterval() {
-				                return 0;
-				            }
-				        })
-				        .build();
+	private void getWebData(JsonParser parser, File file) {
+		String element = "result";
+		JsonArray data;
+		System.out.println("... Downloading New Data From Kraken");
+		final int reguestCount = 5;
+		try {
+//				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+			
+			CloseableHttpClient httpClient = HttpClients.custom()
+			        .setServiceUnavailableRetryStrategy(new ServiceUnavailableRetryStrategy() {
+			            @Override
+			            public boolean retryRequest(
+			                    final HttpResponse response, final int executionCount, final HttpContext context) {
+			                int statusCode = response.getStatusLine().getStatusCode();
+			                return statusCode == 403 && executionCount < reguestCount;
+			            }
+
+			            @Override
+			            public long getRetryInterval() {
+			                return 0;
+			            }
+			        })
+			        .build();
+			
+			HttpUriRequest httpGet = new HttpGet(this.getStrUrl());
+			System.out.println("Executing request : " + httpGet.getRequestLine());
+			CloseableHttpResponse resp = httpClient.execute(httpGet);
+			String strResp = MultiDataUtils.responseToString(resp);
+			
+			if (!StringUtils.EMPTY.equals(strResp)) {
+				JsonObject json = parser.parse(strResp).getAsJsonObject();
 				
-				HttpUriRequest httpGet = new HttpGet(this.getStrUrl());
-				System.out.println("Executing request : " + httpGet.getRequestLine());
-				CloseableHttpResponse resp = httpClient.execute(httpGet);
-				String strResp = MultiDataUtils.responseToString(resp);
-				
-				if (strResp != StringUtils.EMPTY) {
-					JsonObject json = parser.parse(strResp).getAsJsonObject();
+				JsonArray err = json.getAsJsonArray("error");
+				if (err.isJsonNull()) {
+					System.err.println("Error getting index " + this.getPair() + " - "+ err.getAsString());
+				} else {
+					JsonObject result = json.getAsJsonObject(element);
+					data = result.getAsJsonArray(getPair());
 					
-					JsonArray err = json.getAsJsonArray("error");
-					if (err.isJsonNull()) {
-						System.err.println("Error getting index " + this.getPair() + " - "+ err.getAsString());
-					} else {
-						JsonObject result = json.getAsJsonObject(element);
-						data = result.getAsJsonArray(getPair());
-						
-						FileWriter fw = new FileWriter(file, false);
+					try(FileWriter fw = new FileWriter(file, false)) {
 						fw.write(data.toString());
-						fw.close();
 						processData(data);
 					}
 				}
-				resp.close();
-			} catch (Exception e) {
-				System.out.println(e.toString());
 			}
+			resp.close();
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+	}
+
+	private void getExistingData(JsonParser parser, File file) {
+		JsonArray data;
+		String line;
+		System.out.println("... There is Data For Index: " + getPair());
+		StringBuilder sb = new StringBuilder();
+		try (FileReader fr = new FileReader(file);
+			  BufferedReader rd = new BufferedReader(fr)) {
+			while ((line = rd.readLine()) != null) {
+				sb.append(line);
+			}
+			data = parser.parse(sb.toString()).getAsJsonArray();
+			processData(data);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

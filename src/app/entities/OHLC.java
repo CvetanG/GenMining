@@ -1,6 +1,7 @@
 package app.entities;
 
 public class OHLC {
+	
 	private String time;
 	private double open;
 	private double high;
@@ -10,8 +11,7 @@ public class OHLC {
 	private double volume;
 	private double count;
 	private double dailyTR;
-	// Close minus Open
-	private double OC;
+	private double OC; // Close minus Open
 	
 	public String getTime() {
 		return time;

@@ -1,8 +1,9 @@
 package app.entities;
 
 public class MyColumn {
-	int colNum;
-	String colChar;
+	
+	private int colNum;
+	private String colChar;
 	
 	public MyColumn(String colChar, int colNum) {
 		this.colChar = colChar;

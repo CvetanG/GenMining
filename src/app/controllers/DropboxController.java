@@ -35,14 +35,12 @@ public class DropboxController {
     }
 	
 	public File getFile(DbxClientV2 dbxClient, String localPath, String dropboxPath) {
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
 		File localFile = new File(localPath);
-		try {
-			inputStream = dbxClient.files().download(dropboxPath).getInputStream();
+		try (
+				InputStream inputStream = dbxClient.files().download(dropboxPath).getInputStream();
+				OutputStream outputStream = new FileOutputStream(localFile)
+						) {
 		
-			outputStream = new FileOutputStream(localFile);
-	
 			int read = 0;
 			byte[] bytes = new byte[1024];
 	
@@ -53,25 +51,7 @@ public class DropboxController {
 			e.printStackTrace();
 		} catch (IOException e) {
 		e.printStackTrace();
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (outputStream != null) {
-				try {
-					// outputStream.flush();
-					outputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-			}
-		}
-		
+		} 
 		System.out.println("Done getting file from Dropbox!");
 		return localFile;
 	}

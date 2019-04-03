@@ -2,13 +2,13 @@ package app.entities;
 
 public class GMRowEntry {
 	
-	String XMR_USD;
-	long marketCap;
-	long volume;
-	long circulatingSupply;
-	double blocks;
-	String netwHashRate;
-	double difficulty;
+	private String XMR_USD;
+	private long marketCap;
+	private long volume;
+	private long circulatingSupply;
+	private double blocks;
+	private String netwHashRate;
+	private double difficulty;
 	
 	public GMRowEntry() {
 	}

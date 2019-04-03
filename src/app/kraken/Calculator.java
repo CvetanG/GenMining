@@ -21,18 +21,18 @@ import javafx.stage.Stage;
 
 public class Calculator extends Application {
 
-	public static List<Map<String, Double>> list;
+	private static List<Map<String, Double>> list;
 
-	public static final int size = 10;
+	private static final int SIZE = 10;
 	
-	public static double min;
-	public static double max;
+	private static double min;
+	private static double max;
 
 	public static List<TradingContracts> calcBestTradingContracts(Kraken k, Combinations c) {
 
 		List<TradingContracts> unOrderedList = new ArrayList<>();
 
-		for (Integer[] resultList : c.resultList) {
+		for (Integer[] resultList : c.getResultList()) {
 			TradingContracts temp = new TradingContracts(resultList, k.getPeriodList());
 			unOrderedList.add(temp);
 		}
@@ -74,7 +74,7 @@ public class Calculator extends Application {
 		String line02Name = "minPrice/Buy";
 		String line03Name = "Buy/Sell";
 		String stageTitle = "Line Chart Sample";
-		String lineChartTitle = "Stock Monitoring, last " + size + " days";
+		String lineChartTitle = "Stock Monitoring, last " + SIZE + " days";
 		String xAxisLabel = "Date";
 		String yAxisLabel = "Price";
 
@@ -88,7 +88,7 @@ public class Calculator extends Application {
 		yAxis.setLowerBound(Math.round(min - (min * 5 / 100)));
 	    yAxis.setUpperBound(Math.round(max + (max * 5 / 100)));
 		
-	    final LineChart<String, Number> lineChart = new LineChart<String, Number>(xAxis, yAxis);
+	    final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
 
 		lineChart.setTitle(lineChartTitle);
 
@@ -114,10 +114,10 @@ public class Calculator extends Application {
 
 		SimpleDateFormat dtf = new SimpleDateFormat("dd/MM");
 		String pair = "XXMRZUSD";
-		Kraken k = new Kraken(pair, size);
+		Kraken k = new Kraken(pair, SIZE);
 		k.init();
 
-		Combinations c = new Combinations(size);
+		Combinations c = new Combinations(SIZE);
 
 		List<TradingContracts> resultList = Calculator.calcBestTradingContracts(k, c);
 

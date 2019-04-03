@@ -32,8 +32,7 @@ public class Utils {
 	
 	public static String clearFormatCurr(String curr) {
 		curr = curr.substring(0, curr.length()-4);
-		String result = currencyFormater(curr);
-		return result;
+		return currencyFormater(curr);
 	}
 	
 	public static String currencyFormater(String curr) {
@@ -54,9 +53,7 @@ public class Utils {
 	}
 
 	public static long removeSeparetors(String curr) {
-//		curr = curr.replace(",", "");
-		long dCurrr = Long.parseLong(curr.replace(",", ""));
-	    return dCurrr;
+	    return Long.parseLong(curr.replace(",", ""));
 	}
 	
 	/*
@@ -77,16 +74,16 @@ public class Utils {
 	
 	public static List<List<Integer>> listPermutations(List<Integer> permIntList, int count) {
 	    if (count == permIntList.size()) {
-	        List<List<Integer>> result = new ArrayList<List<Integer>>();
+	        List<List<Integer>> result = new ArrayList<>();
 	        result.add(new ArrayList<Integer>());
 	        return result;
 	    }
-	    List<List<Integer>> returnList = new ArrayList<List<Integer>>();
+	    List<List<Integer>> returnList = new ArrayList<>();
 	    Integer firstElement = permIntList.get(count);
 	    List<List<Integer>> recursiveReturn = listPermutations(permIntList, count + 1);
 	    for (List<Integer> intList : recursiveReturn) {
 	        for (int index = 0; index <= intList.size(); index++) {
-	            List<Integer> temp = new ArrayList<Integer>(intList);
+	            List<Integer> temp = new ArrayList<>(intList);
 	            temp.add(index, firstElement);
 	            returnList.add(temp);
 	        }

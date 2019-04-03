@@ -5,13 +5,13 @@ import java.util.List;
 
 public class Combinations {
 	
-	public List<Integer[]> resultList;
+	private List<Integer[]> resultList;
 	
-	public int size;
+	private int size;
 	
     public Combinations(int size) {
 		this.size = size;
-		this.resultList = new ArrayList<Integer[]>();
+		this.resultList = new ArrayList<>();
 		Integer[] result = new Integer[size];
         List<Integer> dataToCombine = new ArrayList<>();
 		for (int i = 0; i < size; i++) {
