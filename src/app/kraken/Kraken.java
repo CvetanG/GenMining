@@ -13,6 +13,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -26,9 +33,12 @@ import app.multidata.MultiDataUtils;
 
 public class Kraken {
 	
+	public static final String TRADE_DATA = "https://api.kraken.com/0/public/OHLC?pair=%s&interval=1440";
+	public static final String ASSET_DATA = "https://api.kraken.com/0/public/AssetPairs?pair=%s";
+	
 	private int period;
+	private int dec;
 	private String pair;
-	private String strUrl;
 	
 	private List<OHLC> periodList;
 	private double lastPrice;
@@ -38,18 +48,18 @@ public class Kraken {
 	private double periodMAX;
 
 	public Kraken(String pair, int period) {
-		this.setPair(pair.toUpperCase());
+		this.pair = pair.toUpperCase();
 		// interval is in minutes 1440 = 1day
 		// 1 (default), 5, 15, 30, 60, 240, 1440, 10080, 21600
-		this.setStrUrl("https://api.kraken.com/0/public/OHLC?pair=" + pair.toUpperCase() + "&interval=1440");
-		this.setPeriod(period);
-		this.setPeriodList(new ArrayList<OHLC>());
+		this.period = period;
+		this.periodList = new ArrayList<>();
 	}
 	
 	public void init(){
 		getLastData();
 		calculateMinMax();
 		calculateTR();
+		getDec();
 		print();
 	}
 
@@ -60,11 +70,9 @@ public class Kraken {
 		fileUrl.append("_dataList.json");
 		File file = new File(fileUrl.toString());
 
-		BufferedReader rd;
 		OutputStreamWriter wr;
 		JsonArray data =  null;
 		String line;
-		FileReader fr;
 
 		Gson gson = new Gson();
 		JsonParser parser = new JsonParser();
@@ -76,9 +84,8 @@ public class Kraken {
 		boolean check = (file.lastModified() + periodMillis) > millis;
 
 		if (file.exists() && check) {
-			try {
-				fr = new FileReader(file);
-				rd = new BufferedReader(fr);
+			try (FileReader fr = new FileReader(file);
+					BufferedReader rd = new BufferedReader(fr)){
 				while ((line = rd.readLine()) != null) {
 					sb.append(line);
 				}
@@ -89,14 +96,14 @@ public class Kraken {
 		} else {
 			try {
 				System.out.println("... Downloading New Data From kraken.com");
-				URL url = new URL(getStrUrl());
+				URL url = new URL(createTradeDateUrl());
 				URLConnection conn = url.openConnection();
 				conn.setDoOutput(true);
 				wr = new OutputStreamWriter(conn.getOutputStream());
 				wr.flush();
 
 				// Get the response
-				rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
 
 				while ((line = rd.readLine()) != null) {
@@ -123,6 +130,31 @@ public class Kraken {
 		}
 		this.setLastPrice(this.getPeriodList().get(getPeriod()).getClose());
 		this.setLastOpen(this.getPeriodList().get(getPeriod()).getOpen());
+	}
+	
+	private void getDec() {
+		
+		String element = "result";
+		try {
+
+			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+			
+			String strUrl = String.format(ASSET_DATA, this.pair);
+			
+			HttpUriRequest httpGet = new HttpGet(strUrl);
+			System.out.println("Executing request : " + strUrl);
+			HttpResponse resp = httpClient.execute(httpGet);
+			String strResp = MultiDataUtils.responseToString(resp);
+			if (!StringUtils.EMPTY.equals(strResp)) {
+				JsonParser parser = new JsonParser();
+				JsonObject jsonResp = parser.parse(strResp).getAsJsonObject();
+				JsonObject jsonAsset = jsonResp.getAsJsonObject(element).getAsJsonObject(this.pair);
+				this.dec = jsonAsset.get("pair_decimals").getAsInt();
+			}
+					
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 
 	private OHLC jsonElementToOHLC(Gson gson, JsonElement jsonElement) {
@@ -186,26 +218,20 @@ public class Kraken {
 		this.setPeriodMAX(pqMax.peek());
 
 	}
+	
+	public String createTradeDateUrl() {
+		return String.format(TRADE_DATA, pair.toUpperCase());
+	}
 
 	private void print() {
 //		System.out.println(String.format("***** TRADING INFO %s ***** ", MultiDataUtils.readPair(this.pair)));
 //		System.out.println(String.format("%d day/s period from %s", (this.periodList.size() - 1), KRAKEN));
 		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.getPair()),  (this.getPeriodList().size() - 1), MultiDataUtils.KRAKEN));
-		System.out.println(String.format("Average TR: %.2f", this.getPeriodTR()));
-		System.out.println(String.format("Open Price: %.2f$", this.getLastOpen()));
-		System.out.println(String.format("Curr Price: %.2f$ %s", this.getLastPrice(), Utils.calcPrintPercentage(this.getLastPrice(), this.getLastOpen())));
-		System.out.println(String.format(" Min Price: %.2f$ %s", this.getPeriodMIN(), Utils.calcPrintPercentage(this.getPeriodMIN(), this.getLastPrice())));
-		System.out.println(String.format(" Max Price: %.2f$ %s", this.getPeriodMAX(), Utils.calcPrintPercentage(this.getPeriodMAX(), this.getLastPrice())));
-	}
-	
-	public static void main(String args[]) {
-		String pair = "XXMRZUSD";
-		Kraken k10 = new Kraken(pair, 10);
-		k10.init();
-		Kraken k20 = new Kraken(pair, 20);
-		k20.init();
-		Kraken k55 = new Kraken(pair, 55);
-		k55.init();
+		System.out.println(String.format("Average TR: %." + dec + "f", this.getPeriodTR()));
+		System.out.println(String.format("Open Price: %." + dec + "f$", this.getLastOpen()));
+		System.out.println(String.format("Curr Price: %." + dec + "f$ %s", this.getLastPrice(), Utils.calcPrintPercentage(this.getLastPrice(), this.getLastOpen())));
+		System.out.println(String.format(" Min Price: %." + dec + "f$ %s", this.getPeriodMIN(), Utils.calcPrintPercentage(this.getPeriodMIN(), this.getLastPrice())));
+		System.out.println(String.format(" Max Price: %." + dec + "f$ %s", this.getPeriodMAX(), Utils.calcPrintPercentage(this.getPeriodMAX(), this.getLastPrice())));
 	}
 	
 	public double getPeriodMIN() {
@@ -252,14 +278,6 @@ public class Kraken {
 		this.lastOpen = lastOpen;
 	}
 
-	public String getStrUrl() {
-		return strUrl;
-	}
-
-	public void setStrUrl(String strUrl) {
-		this.strUrl = strUrl;
-	}
-
 	public void setPeriodList(List<OHLC> periodList) {
 		this.periodList = periodList;
 	}
@@ -287,4 +305,16 @@ public class Kraken {
 	public void setPeriodMAX(double periodMAX) {
 		this.periodMAX = periodMAX;
 	}
+	
+	public static void main(String args[]) {
+//		String pair = "XXMRZUSD";
+		String pair = "XXRPZUSD";
+		Kraken k10 = new Kraken(pair, 10);
+		k10.init();
+		Kraken k20 = new Kraken(pair, 20);
+		k20.init();
+		Kraken k55 = new Kraken(pair, 55);
+		k55.init();
+	}
+	
 }

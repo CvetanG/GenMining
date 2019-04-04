@@ -124,7 +124,7 @@ public class KrakenMD extends Kraken {
 			        })
 			        .build();
 			
-			HttpUriRequest httpGet = new HttpGet(this.getStrUrl());
+			HttpUriRequest httpGet = new HttpGet(createTradeDateUrl());
 			System.out.println("Executing request : " + httpGet.getRequestLine());
 			CloseableHttpResponse resp = httpClient.execute(httpGet);
 			String strResp = MultiDataUtils.responseToString(resp);
@@ -252,7 +252,7 @@ public class KrakenMD extends Kraken {
 			this.setPeriodMAX(pqMax.peek());
 			this.percCurMAX = Utils.calcPercentage(this.getPeriodMAX(), this.getLastPrice());
 		} else {
-			System.out.println("...Executing Request Again: " + this.getStrUrl());
+			System.out.println("...Executing Request Again: " + createTradeDateUrl());
 			this.getLastDataMD();
 			this.calculateMinMaxMD();
 		}
@@ -264,7 +264,7 @@ public class KrakenMD extends Kraken {
 		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.getPair()),  (this.getPeriodList().size() - 1), MultiDataUtils.KRAKEN));
 		int d = 7;
 		printObjects(d);
-		System.out.println(String.format("Average OC: %." + pairDec + "f", this.periodOC));
+		System.out.println(String.format("Average OC: %.%d" + pairDec + "f", this.periodOC));
 		System.out.println(String.format("Average TR: %." + pairDec + "f", this.getPeriodTR()));
 		System.out.println(String.format("Open Price: %." + pairDec + "f$", this.getLastOpen()));
 		System.out.println(String.format("Curr Price: %." + pairDec + "f$ %s", this.getLastPrice(), Utils.calcPrintPercentage(this.getLastPrice(), this.getLastOpen())));

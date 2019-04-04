@@ -25,7 +25,7 @@ public class DropboxController {
 	
 	private static DropboxController instance;
     
-	public DropboxController(){}
+	private DropboxController(){}
     
     public static DropboxController getInstance(){
         if(instance == null){

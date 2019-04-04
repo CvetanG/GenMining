@@ -47,14 +47,14 @@ public class RunMD {
 			System.out.println("Executing request : " + httpGet.getRequestLine());
 			HttpResponse resp = httpClient.execute(httpGet);
 			String strResp = MultiDataUtils.responseToString(resp);
-			if (strResp != StringUtils.EMPTY) {
+			if (!StringUtils.EMPTY.equals(strResp)) {
 				JsonObject json = parser.parse(strResp).getAsJsonObject();
 				result = json.getAsJsonObject(element);
 				// Set<String> resSet = result.keySet();
 				// Set<Entry<String, JsonElement>> entrySet = result.entrySet();
 
 				for (Entry<String, JsonElement> entry : result.entrySet()) {
-					String pair = entry.getKey().toString();
+					String pair = entry.getKey();
 					JsonObject object = entry.getValue().getAsJsonObject();
 					int dec = object.get("pair_decimals").getAsInt();
 					pairs.add(new PairDec(pair, dec));

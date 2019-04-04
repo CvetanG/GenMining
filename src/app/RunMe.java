@@ -8,7 +8,6 @@ import java.io.IOException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.dropbox.core.DbxApiException;
 import com.dropbox.core.DbxAuthInfo;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
@@ -20,25 +19,27 @@ import app.entities.Utils;
 import app.kraken.Kraken;
 
 public class RunMe {
+	
+	private static final String XMR = "XXMRZUSD";
+	private static final String XRP = "XXRPZUSD";
 
-	public static void main(String[] args) throws IOException, DbxApiException, DbxException {
+	private static final String LOCAL_PATH = "GenesisMining.xlsx";
+	private static final String DROPBOX_PATH = "/Finance/Genesis_Mining/" + LOCAL_PATH;
+	private static final String ARG_AUTH_FILE_OUTPUT = "authFile.app";
+
+	public static void main(String[] args) throws IOException, DbxException {
 		
 		System.out.println("Start Program Genesis-Mining");
 		long startTime = System.currentTimeMillis();
 		
-		String localPath = "GenesisMining.xlsx";
-		
-		String dropboxPath = "/Finance/Genesis_Mining/" + localPath;
-		
-    	String argAuthFileOutput = "authFile.app";
     	
-    	DropboxController myDropbox = new DropboxController();
+    	DropboxController myDropbox = DropboxController.getInstance();
         
-        DbxAuthInfo authInfo = myDropbox.createAuth(argAuthFileOutput);
+        DbxAuthInfo authInfo = myDropbox.createAuth(ARG_AUTH_FILE_OUTPUT);
         
         DbxClientV2 client = myDropbox.createClient(authInfo);
         
-        File localFile = myDropbox.getFile(client, localPath, dropboxPath);
+        File localFile = myDropbox.getFile(client, LOCAL_PATH, DROPBOX_PATH);
         
 		FileInputStream fsIP = new FileInputStream(localFile);
 				
@@ -71,14 +72,19 @@ public class RunMe {
 		//close the stream
 		output_file.close();
 		
-		myDropbox.uploadFile(client, localFile, dropboxPath);
-		String pair = "XXMRZUSD";
-		Kraken kr20 = new Kraken(pair, 20);
-		kr20.init();
-		Kraken kr55 = new Kraken(pair, 55);
-		kr55.init();
+		myDropbox.uploadFile(client, localFile, DROPBOX_PATH);
+		
+		Kraken xmr20 = new Kraken(XMR, 20);
+		xmr20.init();
+		Kraken xmr55 = new Kraken(XMR, 55);
+		xmr55.init();
+		
+		Kraken xrp20 = new Kraken(XRP, 20);
+		xrp20.init();
+		Kraken xrp55 = new Kraken(XRP, 55);
+		xrp55.init();
         
-        long endTime   = System.currentTimeMillis();
+        long endTime = System.currentTimeMillis();
 		System.err.println(Utils.duration(startTime, endTime));
 		System.out.println("All Done!!!");
 
