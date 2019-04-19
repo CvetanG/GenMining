@@ -29,7 +29,8 @@ public class MultiData {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Start Finding Deals");
+		System.out.println("");
+		System.out.println("Calculating Top Deals...");
 		findDeals();
 	}
 	

@@ -261,8 +261,9 @@ public class KrakenMD extends Kraken {
 	void print() {
 //		System.out.println(String.format("***** TRADING INFO %s *****", MultiDataUtils.readPair(this.index)));
 //		System.out.println(String.format("Data info for %d day/s period from %s", (this.finalList.size() - 1), MultiDataUtils.KRAKEN));
-		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.getPair()),  (this.getPeriodList().size() - 1), MultiDataUtils.KRAKEN));
-		int d = 7;
+		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****",
+				MultiDataUtils.readPair(this.getPair()),  (this.getPeriodList().size() - 1), MultiDataUtils.KRAKEN));
+		int d = 7; // OC for days
 		printObjects(d);
 		System.out.println(String.format("Average OC: %." + pairDec + "f", this.periodOC));
 		System.out.println(String.format("Average TR: %." + pairDec + "f", this.getPeriodTR()));
