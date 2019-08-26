@@ -100,8 +100,8 @@ public class RunMD {
 	
 
 	public static void main(String[] args) {
-		List<PairDec> pairs = RunMD.getAllPairs();
-		System.out.println("Total Pairs: " + pairs.size());
+		List<PairDec> totalPairs = RunMD.getAllPairs();
+		System.out.println("Total Pairs: " + totalPairs.size());
 		
 //		for (PairDec p : pairs) {
 //			System.out.println(p);
@@ -109,8 +109,8 @@ public class RunMD {
 		
 		int period = 55;
 		int topNum = 5;
-		List<PairDec> filteredPairs = RunMD.filterPairs(pairs);
-		System.out.println("Total Pairs: " + filteredPairs.size());
+		List<PairDec> filteredPairs = RunMD.filterPairs(totalPairs);
+		System.out.println("Filtered Pairs: " + filteredPairs.size());
 		
 //		for (PairDec p : filteredPairs) {
 //			System.out.println(p);

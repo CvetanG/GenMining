@@ -56,17 +56,25 @@ public class KrakenMD extends Kraken {
 		}
 	}
 
-	private void printObjects(int days) {
+	private void printDailyOCList(int days) {
 		int end = this.getPeriodList().size(); // 20
-		int start = end - days; // 13
-		for (int i = start; i < end; i++) {
+		int start = end;
+		if (end > days) {
+			start = end - days; // 13
+			for (int i = start; i < end; i++) {
 //			printObject(this.finalList.get(i).getDailyTR(), start, i, end, "DailyTR: ");
-			printObject(this.getPeriodList().get(i).getOC(), end, i, start, "DailyOC: ");
+				printDailyOC(this.getPeriodList().get(i).getOC(), end, i, start, "DailyOC: ");
+			}
+		} else {
+			for (int i = 1; i < start; i++) { // i = 1 to skip first day TR which is 0.0 
+//			printObject(this.finalList.get(i).getDailyTR(), start, i, end, "DailyTR: ");
+				printDailyOC(this.getPeriodList().get(i).getOC(), start, i, 1, "DailyOC: ");
+			}
 		}
 		System.out.println();
 	}
 
-	private void printObject(double d, int end, int i, int start, String text) {
+	private void printDailyOC(double d, int end, int i, int start, String text) {
 		if (i == start) {
 			System.out.print(text);
 		}
@@ -264,7 +272,7 @@ public class KrakenMD extends Kraken {
 		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****",
 				MultiDataUtils.readPair(this.getPair()),  (this.getPeriodList().size() - 1), MultiDataUtils.KRAKEN));
 		int d = 7; // OC for days
-		printObjects(d);
+		printDailyOCList(d);
 		System.out.println(String.format("Average OC: %." + pairDec + "f", this.periodOC));
 		System.out.println(String.format("Average TR: %." + pairDec + "f", this.getPeriodTR()));
 		System.out.println(String.format("Open Price: %." + pairDec + "f$", this.getLastOpen()));
