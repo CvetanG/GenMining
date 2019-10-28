@@ -275,8 +275,8 @@ public class KrakenMD extends Kraken {
 		printDailyOCList(d);
 		System.out.println(String.format("Average OC: %." + pairDec + "f", this.periodOC));
 		System.out.println(String.format("Average TR: %." + pairDec + "f", this.getPeriodTR()));
-		System.out.println(String.format("Open Price: %." + pairDec + "f$", this.getLastOpen()));
-		System.out.println(String.format("Curr Price: %." + pairDec + "f$ %s", this.getLastPrice(), Utils.calcPrintPercentage(this.getLastPrice(), this.getLastOpen())));
+		System.out.println(String.format("Curr Price: %." + pairDec + "f$", this.getLastPrice()));
+		System.out.println(String.format("Open Price: %." + pairDec + "f$ %s", this.getLastOpen(), Utils.calcPrintPercentage(this.getLastOpen(), this.getLastPrice())));
 		System.out.println(
 				String.format(" Min Price: %." + pairDec + "f$ %s", this.getPeriodMIN(), Utils.printPercentage(this.percCurMIN)));
 		System.out.println(

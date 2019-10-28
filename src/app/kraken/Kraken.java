@@ -228,8 +228,8 @@ public class Kraken {
 //		System.out.println(String.format("%d day/s period from %s", (this.periodList.size() - 1), KRAKEN));
 		System.out.println(String.format("***** TRADING INFO %s %d day/s period from %s *****", MultiDataUtils.readPair(this.getPair()),  (this.getPeriodList().size() - 1), MultiDataUtils.KRAKEN));
 		System.out.println(String.format("Average TR: %." + dec + "f", this.getPeriodTR()));
-		System.out.println(String.format("Open Price: %." + dec + "f$", this.getLastOpen()));
-		System.out.println(String.format("Curr Price: %." + dec + "f$ %s", this.getLastPrice(), Utils.calcPrintPercentage(this.getLastPrice(), this.getLastOpen())));
+		System.out.println(String.format("Curr Price: %." + dec + "f$", this.getLastPrice()));
+		System.out.println(String.format("Open Price: %." + dec + "f$ %s", this.getLastOpen(), Utils.calcPrintPercentage(this.getLastOpen(), this.getLastPrice())));
 		System.out.println(String.format(" Min Price: %." + dec + "f$ %s", this.getPeriodMIN(), Utils.calcPrintPercentage(this.getPeriodMIN(), this.getLastPrice())));
 		System.out.println(String.format(" Max Price: %." + dec + "f$ %s", this.getPeriodMAX(), Utils.calcPrintPercentage(this.getPeriodMAX(), this.getLastPrice())));
 	}

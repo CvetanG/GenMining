@@ -49,19 +49,21 @@ public class WebSitesParser {
 		String netwHashRate;
 		double difficulty;
 		
-		Element elementXMR_USD = (Element) doc.getElementsByClass("table table-striped table-bordered").get(0).childNode(1).childNode(0).childNode(3).childNode(1);
-		XMR_USD = Utils.clearFormatCurr(elementXMR_USD.text());
+//		Element elementXMR_USD = (Element) doc.getElementsByClass("table table-striped table-bordered").get(0).childNode(1).childNode(0).childNode(3).childNode(1);
+//		Element elementXMR_USD = (Element) doc.getElementsByClass("cryptocurrency-price").first().select("h1").first();
+		Element elementXMR_USD = doc.select("section.cryptocurrency-price > span.price").first();
+		XMR_USD = Utils.clearFormatCurr(elementXMR_USD.ownText());
 		System.out.println("Monero USD: " + elementXMR_USD.text());
 		
-		Element elementBlocks = (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(5);
+		Element elementBlocks 		= (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(5);
 		blocks = Utils.removeSeparetors(elementBlocks.text());
 		System.out.println("Block Count: " + elementBlocks.text());
 		
-		Element elementNetwHashRate = (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(7);
+		Element elementNetwHashRate	= (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(7);
 		netwHashRate = Utils.clearFormatCurr(elementNetwHashRate.text());
 		System.out.println("Network Hashrate: " + elementNetwHashRate.text());
 		
-		Element elementDifficulty = (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(9);
+		Element elementDifficulty	= (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(9);
 		difficulty = Utils.removeSeparetors(elementDifficulty.text());
 		System.out.println("Monero Difficulty: " + elementDifficulty.text());
 		
