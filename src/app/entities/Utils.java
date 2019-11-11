@@ -56,6 +56,14 @@ public class Utils {
 	    return Long.parseLong(curr.replace(",", ""));
 	}
 	
+	public static long removeSeparetorsAndCurrency(String curr) {
+		curr = curr.replace(",", "");
+		curr = curr.replace("$", "");
+		curr = curr.replace("\n", "").replace("\r", "");
+		String str = curr.substring(0, curr.length() - 4);
+	    return Long.parseLong(str);
+	}
+	
 	/*
 	private static void createVariationsRepetition(List<int[]> listResults, List<Integer> dataToCombine, int[] result, int count) {
 		if (count < result.length) {
@@ -104,6 +112,23 @@ public class Utils {
 	    }
 	}
 	
+	public static double calcPercentage(double price, double curPrice) {
+		double pers = (price * 100.0f) / curPrice;
+		return -(100.0 - pers);
+	}
+	
+	public static String printPercentage(double pro) {
+		if (pro > 0.0) {
+			return String.format("(+%.2f%s)", pro, "%");
+		} else {
+			return String.format("(%.2f%s)", pro, "%");
+		}
+	}
+	
+	public static String calcPrintPercentage(double a, double b) {
+		return printPercentage(calcPercentage(a, b));
+	}
+	
 	public static void main(String[] args) {
 		
 //		List<int[]> listResults = new ArrayList<>();
@@ -136,22 +161,13 @@ public class Utils {
 	        }
 	        System.out.println();
 	    }
+	    
+	    String testString = "17,296,526 XMR";
+	    Long l = removeSeparetorsAndCurrency(testString);
+	    System.out.println(l);
+	    
+	    
 	}
+
 	
-	public static double calcPercentage(double price, double curPrice) {
-		double pers = (price * 100.0f) / curPrice;
-		return -(100.0 - pers);
-	}
-	
-	public static String printPercentage(double pro) {
-		if (pro > 0.0) {
-			return String.format("(+%.2f%s)", pro, "%");
-		} else {
-			return String.format("(%.2f%s)", pro, "%");
-		}
-	}
-	
-	public static String calcPrintPercentage(double a, double b) {
-		return printPercentage(calcPercentage(a, b));
-	}
 }

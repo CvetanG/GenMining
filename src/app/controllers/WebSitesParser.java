@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 
 import app.entities.GMRowEntry;
 import app.entities.Utils;
@@ -80,22 +81,21 @@ public class WebSitesParser {
 				.timeout(TIMEOUT).validateTLSCertificates(false)
 				.get();
 		
-		long marketCap;
-		long volume;
-		long circulatingSupply;
+//		String tagClassName= "details-panel-item--marketcap-stats flex-container";
+		String tagClassName= "cmc-details-panel-stats k1ayrc-0 OZKKF";
+		Element element = doc.getElementsByClass(tagClassName).get(0);
 		
-		String tagClassName= "details-panel-item--marketcap-stats flex-container";
-		Element elementMarketCap = (Element) doc.getElementsByClass(tagClassName).get(0).childNode(1).childNode(3).childNode(1).childNode(1);
-		marketCap = Utils.removeSeparetors(elementMarketCap.text());
-		System.out.println("Market Cap: $" + elementMarketCap.text());
+		String elementMarketCap = ((Element) element.childNode(0).childNode(1).childNode(0)).text();
+		System.out.println("Market Cap: " + elementMarketCap);
+		Long marketCap = Utils.removeSeparetorsAndCurrency(elementMarketCap);
 		
-		Element elementVolume = (Element) doc.getElementsByClass(tagClassName).get(0).childNode(3).childNode(3).childNode(1);
-		volume = Utils.removeSeparetors(elementVolume.text().substring(0, elementVolume.text().length()-4));
-		System.out.println("Volume (24h): $" + elementVolume.text());
+		String elementVolume = ((Element) element.childNode(1).childNode(1).childNode(0)).text();
+		System.out.println("Volume (24h): " + elementVolume);
+		long volume = Utils.removeSeparetorsAndCurrency(elementVolume);
 		
-		Element elementCirculatingSupply = (Element) doc.getElementsByClass(tagClassName).get(0).childNode(5).childNode(3).childNode(1);
-		circulatingSupply = Utils.removeSeparetors(elementCirculatingSupply.text());
-		System.out.println("Circulating Supply: " + elementCirculatingSupply.text());
+		String elementCirculatingSupply = element.childNode(2).childNode(1).childNode(0).outerHtml();
+		System.out.println("Circulating Supply: " + elementCirculatingSupply);
+		long circulatingSupply = Utils.removeSeparetorsAndCurrency(elementCirculatingSupply);
 		
 		this.rowEntry.setMarketCap(marketCap);
 		this.rowEntry.setVolume(volume);
