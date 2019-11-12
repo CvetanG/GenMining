@@ -94,7 +94,7 @@ public class WebSitesParser {
 		long volume = Utils.removeSeparetorsAndCurrency(elementVolume);
 		
 		String elementCirculatingSupply = element.childNode(2).childNode(1).childNode(0).outerHtml();
-		System.out.println("Circulating Supply: " + elementCirculatingSupply);
+		System.out.println("Circulating Supply: " + elementCirculatingSupply.replace("\n", "").replace("\r", ""));
 		long circulatingSupply = Utils.removeSeparetorsAndCurrency(elementCirculatingSupply);
 		
 		this.rowEntry.setMarketCap(marketCap);
