@@ -30,9 +30,13 @@ public class Utils {
 		return sb.toString();
 	}
 	
-	public static String clearFormatCurr(String curr) {
-		curr = curr.substring(0, curr.length()-4);
+	public static String currencyFormaterWithSuffix(String curr) {
+		curr = removeCurrSuffix(curr);
 		return currencyFormater(curr);
+	}
+	
+	public static String removeCurrSuffix(String curr) {
+		return curr.substring(0, curr.length()-4);
 	}
 	
 	public static String currencyFormater(String curr) {
@@ -60,7 +64,7 @@ public class Utils {
 		curr = curr.replace(",", "");
 		curr = curr.replace("$", "");
 		curr = curr.replace("\n", "").replace("\r", "");
-		String str = curr.substring(0, curr.length() - 4);
+		String str = removeCurrSuffix(curr);
 	    return Long.parseLong(str);
 	}
 	

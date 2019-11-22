@@ -27,6 +27,10 @@ import app.entities.Utils;
 
 public class ExcelController {
 	
+	private static final String CS_USD_SEP = "csUSDSep";
+	private static final String CS_USD = "csUSD";
+	private static final String CS_DEF = "csDef";
+	
 	private static ExcelController instance;
     
 	public ExcelController(){}
@@ -38,10 +42,10 @@ public class ExcelController {
         return instance;
     }
 	
-	public void writeInExcel(Workbook wb, GMRowEntry rowEntry) throws IOException {
+	public void writeInExcel(Workbook wb, GMRowEntry rowEntry) {
 		
 		MyCellStyles myCellStylesRegular = new MyCellStyles(wb);
-		Map<String, CellStyle> myCellStyles = new HashMap<String, CellStyle>();
+		Map<String, CellStyle> myCellStyles = new HashMap<>();
 		myCellStyles = myCellStylesRegular.getMyCellStyles();
 			
 		Sheet worksheet = wb.getSheet("Monero");
@@ -88,14 +92,14 @@ public class ExcelController {
 				"marketCap", "volume", "circSupply",
 				"blocksCol", "netwHashRateCol", "difficultyCol"
 				};
-		List<Cell> cellList = new ArrayList<Cell>(colNames.length);
+		List<Cell> cellList = new ArrayList<>(colNames.length);
 		Row lRow = worksheet.createRow(newRow);
 		for (int i = 0; i < colNames.length; i++) {
 			cellList.add(lRow.createCell(i));
 		}
 		
 		// Column B Date(1)
-		cellList.get(numR.getColNum()).setCellStyle(myCellStyles.get("csDef"));
+		cellList.get(numR.getColNum()).setCellStyle(myCellStyles.get(CS_DEF));
 		cellList.get(numR.getColNum()).setCellType(Cell.CELL_TYPE_FORMULA);
 		cellList.get(numR.getColNum()).setCellFormula(numR.getColChar() + (newRow) + "+ 1");
 	
@@ -114,24 +118,24 @@ public class ExcelController {
 
 		// Column D DoW(3)
 		int dayOfWeek  = calendar.get(Calendar.DAY_OF_WEEK);
-		cellList.get(dowCol.getColNum()).setCellStyle(myCellStyles.get("csDef"));
+		cellList.get(dowCol.getColNum()).setCellStyle(myCellStyles.get(CS_DEF));
 		cellList.get(dowCol.getColNum()).setCellValue(ExampleDate.myDayOfWeek(dayOfWeek));
 
 		// Column E XMR_Day(4)
 		// fill manually 2 days behind
 
 		// Column F H/s(5)
-		cellList.get(hash_SecCol.getColNum()).setCellStyle(myCellStyles.get("csDef"));
+		cellList.get(hash_SecCol.getColNum()).setCellStyle(myCellStyles.get(CS_DEF));
 		cellList.get(hash_SecCol.getColNum()).setCellValue(1300);
 
 		// Column G hash_Sec(6)
-		cellList.get(XMR_1HSCol.getColNum()).setCellStyle(myCellStyles.get("csDef"));
+		cellList.get(XMR_1HSCol.getColNum()).setCellStyle(myCellStyles.get(CS_DEF));
 		cellList.get(XMR_1HSCol.getColNum()).setCellType(Cell.CELL_TYPE_FORMULA);
 		cellList.get(XMR_1HSCol.getColNum()).setCellFormula(XMR_DayCol.getColChar() + (newRow + 1) + "/" + hash_SecCol.getColChar() + (newRow + 1));
 	
 
 		// Column H XMR_USD(7)
-		cellList.get(XMR_USDCol.getColNum()).setCellStyle(myCellStyles.get("csUSD"));
+		cellList.get(XMR_USDCol.getColNum()).setCellStyle(myCellStyles.get(CS_USD));
 		cellList.get(XMR_USDCol.getColNum()).setCellValue(Double.parseDouble(rowEntry.getXMR_USD()));
 
 		// Column I diffPriv(8)
@@ -140,7 +144,7 @@ public class ExcelController {
 			cellList.get(diffPrivCol.getColNum()).setCellFormula(XMR_USDCol.getColChar() + (newRow + 1) + "/" + XMR_USDCol.getColChar() + (newRow) + "-1");
 
 		// Column J USD_Day(9)
-			cellList.get(USD_DayCol.getColNum()).setCellStyle(myCellStyles.get("csUSD"));
+			cellList.get(USD_DayCol.getColNum()).setCellStyle(myCellStyles.get(CS_USD));
 			cellList.get(USD_DayCol.getColNum()).setCellType(Cell.CELL_TYPE_FORMULA);
 			cellList.get(USD_DayCol.getColNum()).setCellFormula(XMR_DayCol.getColChar() + (newRow + 1) + "*" + XMR_USDCol.getColChar() + (newRow + 1));
 
@@ -148,29 +152,29 @@ public class ExcelController {
 		// Column K empty(10)
 			
 		// Column L Market Cap(11)
-		cellList.get(marketCap.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
+		cellList.get(marketCap.getColNum()).setCellStyle(myCellStyles.get(CS_USD_SEP));
 		cellList.get(marketCap.getColNum()).setCellValue(rowEntry.getMarketCap());
 		
 		// Column M Volume(12)
-		cellList.get(volume.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
+		cellList.get(volume.getColNum()).setCellStyle(myCellStyles.get(CS_USD_SEP));
 		cellList.get(volume.getColNum()).setCellValue(rowEntry.getVolume());
 		
 		// Column N Circulating Supply(13)
-		cellList.get(circSupply.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
+		cellList.get(circSupply.getColNum()).setCellStyle(myCellStyles.get(CS_USD_SEP));
 		cellList.get(circSupply.getColNum()).setCellValue(rowEntry.getCirculatingSupply());
 		
 		// Column O block(14)
-		cellList.get(blocksCol.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
+		cellList.get(blocksCol.getColNum()).setCellStyle(myCellStyles.get(CS_USD_SEP));
 		cellList.get(blocksCol.getColNum()).setCellValue(rowEntry.getBlocks());
 
 		// Column P netwHashRate(15)
-		cellList.get(netwHashRateCol.getColNum()).setCellStyle(myCellStyles.get("csUSD"));
+		cellList.get(netwHashRateCol.getColNum()).setCellStyle(myCellStyles.get(CS_USD));
 		Double temp = Double.parseDouble(rowEntry.getNetwHashRate());
 		Double nhr = (temp > 10.0) ? temp : (temp * 1000);
 		cellList.get(netwHashRateCol.getColNum()).setCellValue(nhr);
 		
 		// Column Q difficulty(16)
-		cellList.get(difficultyCol.getColNum()).setCellStyle(myCellStyles.get("csUSDSep"));
+		cellList.get(difficultyCol.getColNum()).setCellStyle(myCellStyles.get(CS_USD_SEP));
 		cellList.get(difficultyCol.getColNum()).setCellValue(rowEntry.getDifficulty());
 
 	}

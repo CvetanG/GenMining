@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
 
 import app.entities.GMRowEntry;
 import app.entities.Utils;
@@ -41,9 +40,7 @@ public class WebSitesParser {
 	public void getMoneroInfoCoinWarz() throws IOException {
 		String myUrl = "https://www.coinwarz.com/cryptocurrency/coins/monero/";
 		
-		Document doc = Jsoup.connect(myUrl)
-				.timeout(TIMEOUT).validateTLSCertificates(false)
-				.get();
+		Document doc = urlConnect(myUrl);
 		
 		String XMR_USD;
 		double blocks;
@@ -53,18 +50,20 @@ public class WebSitesParser {
 //		Element elementXMR_USD = (Element) doc.getElementsByClass("table table-striped table-bordered").get(0).childNode(1).childNode(0).childNode(3).childNode(1);
 //		Element elementXMR_USD = (Element) doc.getElementsByClass("cryptocurrency-price").first().select("h1").first();
 		Element elementXMR_USD = doc.select("section.cryptocurrency-price > span.price").first();
-		XMR_USD = Utils.clearFormatCurr(elementXMR_USD.ownText());
+		XMR_USD = Utils.currencyFormater(elementXMR_USD.ownText());
 		System.out.println("Monero USD: " + elementXMR_USD.text());
 		
-		Element elementBlocks 		= (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(5);
+		Element elementParrent = (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1);
+		
+		Element elementBlocks = (Element) elementParrent.childNode(5);
 		blocks = Utils.removeSeparetors(elementBlocks.text());
 		System.out.println("Block Count: " + elementBlocks.text());
 		
-		Element elementNetwHashRate	= (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(7);
-		netwHashRate = Utils.clearFormatCurr(elementNetwHashRate.text());
+		Element elementNetwHashRate	= (Element) elementParrent.childNode(7);
+		netwHashRate = Utils.currencyFormaterWithSuffix(elementNetwHashRate.text());
 		System.out.println("Network Hashrate: " + elementNetwHashRate.text());
 		
-		Element elementDifficulty	= (Element) doc.getElementsByClass("table table-bordered table-striped").get(0).childNode(3).childNode(1).childNode(9);
+		Element elementDifficulty	= (Element) elementParrent.childNode(9);
 		difficulty = Utils.removeSeparetors(elementDifficulty.text());
 		System.out.println("Monero Difficulty: " + elementDifficulty.text());
 		
@@ -77,9 +76,7 @@ public class WebSitesParser {
 	public void getMoneroInfoCoinMarketCap() throws IOException {
 		String myUrl = "https://coinmarketcap.com/currencies/monero/";
 		
-		Document doc = Jsoup.connect(myUrl)
-				.timeout(TIMEOUT).validateTLSCertificates(false)
-				.get();
+		Document doc = urlConnect(myUrl);
 		
 //		String tagClassName= "details-panel-item--marketcap-stats flex-container";
 		String tagClassName= "cmc-details-panel-stats k1ayrc-0 OZKKF";
@@ -100,6 +97,12 @@ public class WebSitesParser {
 		this.rowEntry.setMarketCap(marketCap);
 		this.rowEntry.setVolume(volume);
 		this.rowEntry.setCirculatingSupply(circulatingSupply);
+	}
+
+	private Document urlConnect(String myUrl) throws IOException {
+		return Jsoup.connect(myUrl)
+				.timeout(TIMEOUT).validateTLSCertificates(false)
+				.get();
 	}
 	
 	public static void main(String[] args) throws IOException {
