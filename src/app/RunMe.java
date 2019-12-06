@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -20,8 +22,13 @@ import app.kraken.Kraken;
 
 public class RunMe {
 	
-	private static final String XMR = "XXMRZUSD";
-	private static final String XRP = "XXRPZUSD";
+	private static final String XMR_USD = "XXMRZUSD";
+	private static final String XRP_USD = "XXRPZUSD";
+
+	private static final String BTC_USD = "XXBTZUSD";
+	private static final String BCH_USD = "BCHUSD";
+	private static final String ETH_USD = "XETHZUSD";
+	private static final String LTC_USD = "XLTCZUSD";
 
 	private static final String LOCAL_PATH = "GenesisMining.xlsx";
 	private static final String DROPBOX_PATH = "/Finance/Genesis_Mining/" + LOCAL_PATH;
@@ -74,16 +81,22 @@ public class RunMe {
 		
 		myDropbox.uploadFile(client, localFile, DROPBOX_PATH);
 		
-		Kraken xmr20 = new Kraken(XMR, 20);
-		xmr20.init();
-		Kraken xmr55 = new Kraken(XMR, 55);
-		xmr55.init();
+		List<String> pairs = new ArrayList<>();
+		pairs.add(XMR_USD);
+		pairs.add(XRP_USD);
+
+		pairs.add(BTC_USD);
+		pairs.add(BCH_USD);
+		pairs.add(ETH_USD);
+		pairs.add(LTC_USD);
 		
-		Kraken xrp20 = new Kraken(XRP, 20);
-		xrp20.init();
-		Kraken xrp55 = new Kraken(XRP, 55);
-		xrp55.init();
-        
+		for (String p : pairs) {
+			Kraken xmr20 = new Kraken(p, 20);
+			xmr20.init();
+			Kraken xmr55 = new Kraken(p, 55);
+			xmr55.init();
+		}
+		
         long endTime = System.currentTimeMillis();
 		System.err.println(Utils.duration(startTime, endTime));
 		System.out.println("All Done!!!");
