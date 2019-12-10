@@ -22,14 +22,6 @@ import app.kraken.Kraken;
 
 public class RunMe {
 	
-	private static final String XMR_USD = "XXMRZUSD";
-	private static final String XRP_USD = "XXRPZUSD";
-
-	private static final String BTC_USD = "XXBTZUSD";
-	private static final String BCH_USD = "BCHUSD";
-	private static final String ETH_USD = "XETHZUSD";
-	private static final String LTC_USD = "XLTCZUSD";
-
 	private static final String LOCAL_PATH = "GenesisMining.xlsx";
 	private static final String DROPBOX_PATH = "/Finance/Genesis_Mining/" + LOCAL_PATH;
 	private static final String ARG_AUTH_FILE_OUTPUT = "authFile.app";
@@ -82,14 +74,9 @@ public class RunMe {
 		myDropbox.uploadFile(client, localFile, DROPBOX_PATH);
 		
 		List<String> pairs = new ArrayList<>();
-		pairs.add(XMR_USD);
-		pairs.add(XRP_USD);
+		pairs.add(PairsConstant.XMR_USD);
+		pairs.add(PairsConstant.XRP_USD);
 
-		pairs.add(BTC_USD);
-		pairs.add(BCH_USD);
-		pairs.add(ETH_USD);
-		pairs.add(LTC_USD);
-		
 		for (String p : pairs) {
 			Kraken xmr20 = new Kraken(p, 20);
 			xmr20.init();

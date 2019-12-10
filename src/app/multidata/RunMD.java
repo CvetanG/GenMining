@@ -15,6 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import app.PairsConstant;
 import app.entities.PairDec;
 
 public class RunMD {
@@ -100,6 +101,23 @@ public class RunMD {
 	
 
 	public static void main(String[] args) {
+		int period = 55;
+		int topNum = 5;
+		List<String> pairsStrRevolut = new ArrayList<>();
+		List<PairDec> pairsRevolut = new ArrayList<>();
+		pairsStrRevolut.add(PairsConstant.XRP_USD);
+
+		pairsStrRevolut.add(PairsConstant.BTC_USD);
+		pairsStrRevolut.add(PairsConstant.BCH_USD);
+		pairsStrRevolut.add(PairsConstant.ETH_USD);
+		pairsStrRevolut.add(PairsConstant.LTC_USD);
+		
+		for (String p : pairsStrRevolut) {
+			pairsRevolut.add(new PairDec(p, 0));
+		}
+		
+		
+		
 		List<PairDec> totalPairs = RunMD.getAllPairs();
 		System.out.println("Total Pairs: " + totalPairs.size());
 		
@@ -107,16 +125,22 @@ public class RunMD {
 //			System.out.println(p);
 //		}
 		
-		int period = 55;
-		int topNum = 5;
 		List<PairDec> filteredPairs = RunMD.filterPairs(totalPairs);
 		System.out.println("Filtered Pairs: " + filteredPairs.size());
 		
 //		for (PairDec p : filteredPairs) {
 //			System.out.println(p);
 //		}
+		
 		MultiData md = new MultiData(filteredPairs, period, topNum);
 		md.init(false);
+		
+		System.out.println();
+		totalPairs.retainAll(pairsRevolut);
+		System.out.println("***** REVOLUT DATA START *****");
+		MultiData mdR = new MultiData(totalPairs, period, pairsRevolut.size());
+		mdR.init(false);
+		System.out.println("***** REVOLUT DATA END *****");
 	}
 }
 
