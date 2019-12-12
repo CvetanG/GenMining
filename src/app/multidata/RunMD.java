@@ -27,6 +27,7 @@ public class RunMD {
 		pairsOnly.add("XMR");
 		pairsOnly.add("USD");
 		pairsOnly.add("XRP");
+		pairsOnly.add("XTZ");
 		
 		pairsRemove.add(".d");
 		pairsRemove.add("USDT");
