@@ -17,6 +17,7 @@ import com.google.gson.JsonParser;
 
 import app.PairsConstant;
 import app.entities.PairDec;
+import app.entities.Utils;
 
 public class RunMD {
 
@@ -102,6 +103,8 @@ public class RunMD {
 	
 
 	public static void main(String[] args) {
+		System.out.println("Start Program MD");
+		long startTime = System.currentTimeMillis();
 		int period = 55;
 		int topNum = 5;
 		List<String> pairsStrRevolut = new ArrayList<>();
@@ -135,6 +138,7 @@ public class RunMD {
 		
 		MultiData md = new MultiData(filteredPairs, period, topNum);
 		md.init(false);
+//		md.initStreams(false);
 		
 		System.out.println();
 		totalPairs.retainAll(pairsRevolut);
@@ -142,6 +146,9 @@ public class RunMD {
 		MultiData mdR = new MultiData(totalPairs, period, pairsRevolut.size());
 		mdR.init(false);
 		System.out.println("***** REVOLUT DATA END *****");
+		long endTime = System.currentTimeMillis();
+		System.err.println(Utils.duration(startTime, endTime));
+		System.out.println("MD Done!!!");
 	}
 }
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import app.entities.PairDec;
 
@@ -23,12 +25,26 @@ public class MultiData {
 	public void init(boolean print) {
 		for (KrakenMD kr : krakenList) {
 			kr.init(print);
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+		}
+		System.out.println("");
+		System.out.println("Calculating Top Deals...");
+		findDeals();
+	}
+	
+	public void initStreams(boolean print) {
+		krakenList.stream().forEach(kr -> {
+			kr.init(print);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
+	    });
 		System.out.println("");
 		System.out.println("Calculating Top Deals...");
 		findDeals();
