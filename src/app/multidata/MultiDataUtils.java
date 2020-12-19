@@ -28,7 +28,21 @@ public class MultiDataUtils {
 		throw new AssertionError();
 	}
 	
+	protected static Set<Object> keySet;
+	
+	private static Properties prop;
+	
 	public static final String KRAKEN = "kraken.com";
+	
+	static {
+		prop = new Properties();
+		try (InputStream input = new FileInputStream("curruncy.properties")) {
+			prop.load(input);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		keySet = prop.keySet();
+	}
 
 	public static String readCurruncy(String curr) {
 		Properties prop = new Properties();
@@ -42,25 +56,31 @@ public class MultiDataUtils {
 	
 	public static String readPair(String pair) {
 		StringBuilder sb = new StringBuilder();
-		Properties prop = new Properties();
-		try (InputStream input = new FileInputStream("curruncy.properties")) {
-			prop.load(input);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-		Set<Object> keySet = prop.keySet();
+		String temp = "";
 		for (Object obj : keySet) {
 			if (pair.startsWith(obj.toString())) {
-				sb.append(prop.getProperty(obj.toString()));
-				sb.append(" ");
+				temp = prop.getProperty(obj.toString());
 				break;
 			}
 		}
+		if (temp.isEmpty()) {
+//			sb.append("UNKNOWN ");
+			return pair;
+		} else {
+			sb.append(temp + " ");
+		}
+
 		for (Object obj : keySet) {
 			if (pair.endsWith(obj.toString())) {
-				sb.append(prop.getProperty(obj.toString()));
+				temp = prop.getProperty(obj.toString());
 				break;
 			}
+		}
+		if (temp.isEmpty()) {
+//			sb.append("UNKNOWN");
+			return pair;
+		} else {
+			sb.append(temp);
 		}
 		return sb.toString().toUpperCase();
 	}
