@@ -8,4 +8,7 @@ public interface PairsConstant {
 	public static final String BCH_USD = "BCHUSD";
 	public static final String ETH_USD = "XETHZUSD";
 	public static final String LTC_USD = "XLTCZUSD";
+
+	public static final String XML_USD = "XXLMZUSD";
+	public static final String EOS_USD = "EOSUSD";
 }

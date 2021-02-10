@@ -32,6 +32,14 @@ public class RunMD {
 		
 		pairsRemove.add(".d");
 		pairsRemove.add("USDT");
+		
+		pairsRemove.add("EUR");
+		pairsRemove.add("GBP");
+		pairsRemove.add("JPY");
+		pairsRemove.add("CHF");
+		pairsRemove.add("AUD");
+		pairsRemove.add("CAD");
+		pairsRemove.add("USDCUSD");
 	}
 	
 	private RunMD() {
@@ -107,25 +115,26 @@ public class RunMD {
 		long startTime = System.currentTimeMillis();
 		int period = 55;
 		int topNum = 5;
+		
 		List<String> pairsStrRevolut = new ArrayList<>();
-		List<PairDec> pairsRevolut = new ArrayList<>();
 		pairsStrRevolut.add(PairsConstant.XRP_USD);
-
 		pairsStrRevolut.add(PairsConstant.BTC_USD);
 		pairsStrRevolut.add(PairsConstant.BCH_USD);
 		pairsStrRevolut.add(PairsConstant.ETH_USD);
 		pairsStrRevolut.add(PairsConstant.LTC_USD);
+		pairsStrRevolut.add(PairsConstant.XML_USD);
+		pairsStrRevolut.add(PairsConstant.EOS_USD);
+		
+		List<PairDec> pairsRevolut = new ArrayList<>();
 		
 		for (String p : pairsStrRevolut) {
 			pairsRevolut.add(new PairDec(p, 0));
 		}
 		
-		
-		
 		List<PairDec> totalPairs = RunMD.getAllPairs();
 		System.out.println("Total Pairs: " + totalPairs.size());
 		
-//		for (PairDec p : pairs) {
+//		for (PairDec p : totalPairs) {
 //			System.out.println(p);
 //		}
 		
