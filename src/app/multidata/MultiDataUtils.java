@@ -36,7 +36,7 @@ public class MultiDataUtils {
 	
 	static {
 		prop = new Properties();
-		try (InputStream input = new FileInputStream("curruncy.properties")) {
+		try (InputStream input = new FileInputStream("currency.properties")) {
 			prop.load(input);
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -46,7 +46,7 @@ public class MultiDataUtils {
 
 	public static String readCurruncy(String curr) {
 		Properties prop = new Properties();
-		try (InputStream input = new FileInputStream("curruncy.properties")) {
+		try (InputStream input = new FileInputStream("currency.properties")) {
 			prop.load(input);
 		} catch (IOException ex) {
 			ex.printStackTrace();
